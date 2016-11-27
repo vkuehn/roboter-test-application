@@ -1,0 +1,7 @@
+{
+  "appName": "roboter-test-application",
+  "appNameShort": "robota",
+  "appDataPath": "/data",
+  "port": 8081,
+  "resourcePath": "./resources/"
+}

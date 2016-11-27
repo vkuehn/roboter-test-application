@@ -1,0 +1,105 @@
+/* 
+ Robot Server index page formating
+ */
+/* Main */
+body {
+	font: 100.0% "Trebuchet MS", sans-serif;
+}
+
+#welcome {
+	position: absolute;
+	left: 10em;
+	top: 3.5em;
+}
+
+#serverIPs {
+	position: absolute;
+	top: 15 em;
+	left: 50%;
+	list-style-type: none;
+}
+
+#iconShutdown {
+	position: absolute;
+	right: 3em;;
+	top: 3em;
+}
+
+.ui-icon-power{
+	font-size: 2.0em;
+	color: #ff0000;
+}
+
+#warnings {
+	position: fixed; !important;
+	top: 10em;		 !important;
+	left: 50%;		 !important;
+	transform: translate(-50%, -50%); !important;
+	font-weight: bold; 	!important;
+	font-size: 1.5em;	!important;
+}
+
+#guide {
+	position: absolute;
+	left: 20em;
+	top: 13em;
+	border: 0; 
+	color: #f6931f;
+	font-weight: bold; 
+}
+
+#hackffmLogo {
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	width: 145px;
+	height: 180px;
+}
+
+#title {
+	position: absolute;
+	left: 155px;
+	top: 10px;
+}
+/*--- Modal application dialog --------*/
+#titleAdditionalApp {
+	position: absolute;
+	right: 155px;
+	top: 10px;
+}
+
+#freeApplications {
+	position: absolute;
+	right: 155px;
+	top: 50px;
+}
+
+#addFreeApplication {
+	position: absolute;
+	right: 120px;
+	top: 50px;
+	font-size: 2.0em;
+}
+/*-----------application tabs------------------*/
+#tabsHeader {
+	position: absolute;
+	top: 170px;
+}
+
+#tabs {
+/* 	position: absolute; */
+	top: 230px;
+}
+
+.ui-tabs .ui-tabs-panel {
+    display: block;
+    border-width: 0;
+    padding: 0em 0em;
+    background: none;
+    height: 850px;
+}
+
+iframe {
+	width: 100%;
+	height: 100%;
+}

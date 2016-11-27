@@ -1,0 +1,62 @@
+/* 
+ roboto control application (rca) style
+ */
+@CHARSET "UTF-8";
+
+/*--slider-------------------------*/
+#labelCurrentSet {
+	position: absolute;
+	top: 1em;
+	left: 2em;
+}
+
+#slider-position-yaw {
+	position: absolute;
+	top: 18em;
+	left: 2em;
+	height: 10px;
+	width: 300px;
+}
+
+#positionYaw{
+	border: 0;
+	color: #f6931f;
+	font-weight: bold;
+}
+
+#slider-position-pitch{
+	position: absolute;
+	top:  3em;
+	left: 2em;
+	height: 250px;
+	width: 10px;
+}
+
+#positionPitch{
+	border: 0; 
+	color: #f6931f; 
+	font-weight: bold;
+}
+
+#labelPositionReached{
+	position: absolute;
+	top: 22em;
+	left: 2em;	
+}
+
+#moveResult{
+	border: 0;
+	color: #f6931f;
+	font-weight: bold;
+}
+/*--icons--------------------------*/
+.ui-icon {
+	font-size: 2.0em;
+	color: #f6931f;
+}
+
+#tableDirections {
+	position: absolute;
+	top: 2em;
+	left: 23em;
+}
