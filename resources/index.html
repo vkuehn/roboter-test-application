@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>jQuery UI Slider - Range with fixed minimum</title>
+<title>Roboter test application</title>
 <link href="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.css"	rel="stylesheet">
 <link	href="/javascripts/jquery-ui-iconfont-master/jquery-ui.icon-font.css"	rel="stylesheet" type="text/css" />
-<link href="/stylesheets/rca.css" rel="stylesheet"	type="text/css" />
+<link href="/stylesheets/robota.css" rel="stylesheet"	type="text/css" />
 
 <script	src="/javascripts/jquery-ui-1.12.1.custom/external/jquery/jquery.js"></script>
 <script src="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
@@ -14,7 +14,7 @@
 
 	<div id="labelCurrentSet">
 		<label>Currently Set:</label>
-		<input type="text" id="positionYaw" readonly /> 
+		<input type="text" id="labellabelPositionPitch" readonly />
 		<input type="text" id="positionPitch" readonly	/>
 	</div>
 
@@ -45,9 +45,9 @@
 			</tr>
 		</table>
 	</div>
-	
+
 	<script>
-		var appName = 'rca'; 
+		var appName = 'robota';
 		var url = '/' + appName + '/api';
 		var left = { posYaw : 37, posPitch : 37 } //TODO in zentrale Konfig auslagern und auch in app laden
 		var center = { move: 'stop' }
@@ -58,7 +58,7 @@
 		$(function() {
 			/*set default screen text values*/
 			$("#moveResult").val(" [ not yet ]");
-			$("#positionYaw").val(textYaw + " " + left.posYaw);
+			$("#labellabelPositionPitch").val(textYaw + " " + left.posYaw);
 			$("#positionPitch").val(textPitch + " " + left.posPitch);
 			/*set arrow functions*/
 			$("#moveLeft").click(function(){ center.move ='left';  doMove(center)} );
@@ -78,7 +78,7 @@
 				max : 255,
 				slide : function(event, ui) {
 					left.posYaw = ui.value;
-					$("#positionYaw").val(textYaw + " " + left.posYaw);
+					$("#labellabelPositionPitch").val(textYaw + " " + left.posYaw);
 					$.post(url + '/eye/left', left).done(function(leftEye) {	showMyPositions(leftEye); });
 				}
 			});
@@ -107,11 +107,11 @@
 			}
 			showMoveResult(positions);
 		}
-		
+
 		function doMove(m){
 			$.post(url + '/move', m).done( function(result) {	showMoveResult(result);	});
 		}
-		
+
 		function showMoveResult(result){
 			$("#moveResult").val(result);
 		}
