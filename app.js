@@ -19,6 +19,7 @@ const config =	JSON.parse(helper.loadFile(configPath + '/' + configFile));
 var appName         = config.appName;
 var port						= config.port;
 var resourcePath		= config.resourcePath;
+var left						= config.left;
 
 helper.log ('start ' + appName);
 
@@ -50,16 +51,15 @@ app.get('/' + appName + '/doShutdown',function (req, res) {
 	process.exit();
 });
 
-//--API rca-------------------------------------------------
-var rca = 'rca';
-app.post('/' + rca + '/api/move',function (req, res) {
+//--API robota-------------------------------------------------
+var robota = 'robota';
+app.post('/' + robota + '/api/move',function (req, res) {
 	var move = req.body.move;
 	//serial send
 	res.send(JSON.stringify('moved ' + move));
 });
 
-app.post('/' + rca + '/api/eye/left', function (req, res) {
-  var left = { posPitch:37, posYaw:37 }
+app.post('/' + robota + '/api/eye/left', function (req, res) {
 	left.posPitch = req.body.posPitch;
 	left.posYaw = req.body.posYaw;
 	//MQTT Update
@@ -67,7 +67,7 @@ app.post('/' + rca + '/api/eye/left', function (req, res) {
 	res.send(left);
 });
 
-//error handlers----------------------------------------------------------
+//==error handlers==============================================================
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -14,7 +14,7 @@
 
 	<div id="labelCurrentSet">
 		<label>Currently Set:</label>
-		<input type="text" id="labellabelPositionPitch" readonly />
+		<input type="text" id="labelPositionPitch" readonly />
 		<input type="text" id="positionPitch" readonly	/>
 	</div>
 
@@ -58,7 +58,7 @@
 		$(function() {
 			/*set default screen text values*/
 			$("#moveResult").val(" [ not yet ]");
-			$("#labellabelPositionPitch").val(textYaw + " " + left.posYaw);
+			$("#labelPositionPitch").val(textYaw + " " + left.posYaw);
 			$("#positionPitch").val(textPitch + " " + left.posPitch);
 			/*set arrow functions*/
 			$("#moveLeft").click(function(){ center.move ='left';  doMove(center)} );
@@ -78,7 +78,7 @@
 				max : 255,
 				slide : function(event, ui) {
 					left.posYaw = ui.value;
-					$("#labellabelPositionPitch").val(textYaw + " " + left.posYaw);
+					$("#labelPositionPitch").val(textYaw + " " + left.posYaw);
 					$.post(url + '/eye/left', left).done(function(leftEye) {	showMyPositions(leftEye); });
 				}
 			});
