@@ -9,34 +9,37 @@ var fs = require("fs");
 var logger = require('morgan');
 var path = require('path');
 
-const helper = require('./node_modules/node-helper/node-helper.js');
-const config = require('./settings/config.json');
+const helper = require('./node_modules/node-helper/node-helper');
+const config = require('./resources/config.json');
 
-//keep the order here !
+//keep the order from here !
 var appName         = config.appName;
-var appNameShort		= config.appNameShort;
-var port						= config.port;
-var resourcePath		= config.resourcePath;
-var left						= config.left;
+var appNameShort	= config.appNameShort;
+var port			= config.port;
+var publicPath		= config.publicPath;
+var resourcePath	= config.resourcePath;
+var left			= config.left;
 
-helper.log ('start ' + appName);
+var appHelper		= require(resourcePath + '/' + appNameShort);
 
 //--server ---------------------------------------------------------------------
 var server = app.listen(port, function() {
-	var host = server.address().address;
-	helper.log(appName + ' app listening at http://%s:%s', host, port)
+	var host = server.address().address
+	var message = appName + ' app listening at http://' + host + ':' + port;
+	helper.log(message);
 });
 
 //--view engine setup-----------------------------------------------------------
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(favicon(path.join(__dirname, resourcePath + 'images', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, publicPath + 'images', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, resourcePath)));
+app.use(express.static(path.join(__dirname, publicPath)));
 
+helper.log ('started ' + appName);
 //--json body parser-----------------------------------------
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 app.use( bodyParser.json() );
 var urlencodedParser = app.use(bodyParser.urlencoded({
   extended: false
@@ -53,6 +56,8 @@ app.get('/' + appName + '/doShutdown',function (req, res) {
 app.post('/' + appNameShort + '/api/move',function (req, res) {
 	var move = req.body.move;
 	//serial send
+	var m = appHelper.getLetter(move);
+	helper.log('move ' + m);
 	res.send(JSON.stringify('moved ' + move));
 });
 
