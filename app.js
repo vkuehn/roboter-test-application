@@ -9,14 +9,12 @@ var fs = require("fs");
 var logger = require('morgan');
 var path = require('path');
 
-var helper = require('./node_modules/node-helper/node-helper.js');
+const helper = require('./node_modules/node-helper/node-helper.js');
+const config = require('./settings/config.json');
 
 //keep the order here !
-const configPath = './settings/';
-const configFile = 'config.json';
-const config =	JSON.parse(helper.loadFile(configPath + '/' + configFile));
-
 var appName         = config.appName;
+var appNameShort		= config.appNameShort;
 var port						= config.port;
 var resourcePath		= config.resourcePath;
 var left						= config.left;
@@ -51,15 +49,14 @@ app.get('/' + appName + '/doShutdown',function (req, res) {
 	process.exit();
 });
 
-//--API robota-------------------------------------------------
-var robota = 'robota';
-app.post('/' + robota + '/api/move',function (req, res) {
+//--API-------------------------------------------------------------------------
+app.post('/' + appNameShort + '/api/move',function (req, res) {
 	var move = req.body.move;
 	//serial send
 	res.send(JSON.stringify('moved ' + move));
 });
 
-app.post('/' + robota + '/api/eye/left', function (req, res) {
+app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
 	left.posPitch = req.body.posPitch;
 	left.posYaw = req.body.posYaw;
 	//MQTT Update
