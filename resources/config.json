@@ -4,7 +4,7 @@
   "appDataPath": "/data/",
   "port": 8081,
   "publicPath": "./public/",
-  "resourcePath": "./resources/",
+  "resourcePath": "resources",
   "left": {
       "posPitch":37,
       "posYaw":37

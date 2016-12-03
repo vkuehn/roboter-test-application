@@ -17,10 +17,10 @@ var appName         = config.appName;
 var appNameShort	= config.appNameShort;
 var port			= config.port;
 var publicPath		= config.publicPath;
-var resourcePath	= config.resourcePath;
+var resourcePath	= __dirname + config.resourcePath;
 var left			= config.left;
 
-var appHelper		= require(resourcePath + '/' + appNameShort);
+var robota		= require(resourcePath + '/' + appNameShort);
 
 //--server ---------------------------------------------------------------------
 var server = app.listen(port, function() {
@@ -45,18 +45,47 @@ var urlencodedParser = app.use(bodyParser.urlencoded({
   extended: false
 }));
 
+//==Worker Processes============================================================
+
+var texte = [];
+
+function finishThis(){
+	process.exit(0);
+}
+
+var rsSerial	= new helper.runScript();
+rsSerial.start(resourcePath + 'serial.js');
+
+setInterval(function () { 
+    rsSerial.send('hello world'); //kann auch json sein
+    var master = 'Master ' + 'Process ['+process.pid+'], uptime '+ process.uptime()+'s';
+    var recieve = rsSerial.recieve(); //returns an array
+    recieve.forEach(function(r) {
+    	texte.push(master + ' ' + r);
+    });
+}, 1000);
+setTimeout(function () {
+	texte.forEach(function (text) {
+		helper.log('[TEXT]: ' + text);
+	})
+    
+}, 5000);
+setInterval(function () {
+	finishThis();
+}, 8000);
+
 //==API's=======================================================================
 app.get('/' + appName + '/doShutdown',function (req, res) {
 	helper.log('shutdown by the User');
 	res.send(appName + ' is down');
-	process.exit();
+	finishThis();
 });
 
 //--API-------------------------------------------------------------------------
 app.post('/' + appNameShort + '/api/move',function (req, res) {
 	var move = req.body.move;
 	//serial send
-	var m = appHelper.getLetter(move);
+	var m = robota.getLetter(move);
 	helper.log('move ' + m);
 	res.send(JSON.stringify('moved ' + move));
 });
@@ -99,5 +128,3 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-module.exports = app;

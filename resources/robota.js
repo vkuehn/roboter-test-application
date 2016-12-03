@@ -14,6 +14,18 @@ function getLetter(text) {
 	case 'right':
 		return 'd';
 		break;
+	case 'turnRight':
+		return 'e';
+		break;
+	case 'turnLeft':
+		return 'q';
+		break;	
+	case 'stand':
+		return '1';
+		break;
+	case 'sit':
+		return '0';
+		break;
 	default:
 		return text;
 		break;
