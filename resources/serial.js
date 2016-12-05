@@ -32,7 +32,7 @@ process.on('disconnect',function() {
 
 process.on('message', function(m) {
 	console.log('m ' +m);
-	if(m.toString === 'kill'){
+	if(m.toString() === 'kill'){
 		console.log('the end');
 		process.exit(0);
 	}
