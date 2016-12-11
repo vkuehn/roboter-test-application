@@ -21,10 +21,10 @@ function getLetter(text) {
 		return 'q';
 		break;	
 	case 'stand':
-		return '1';
+		return '!';
 		break;
 	case 'sit':
-		return '0';
+		return '.';
 		break;
 	default:
 		return text;

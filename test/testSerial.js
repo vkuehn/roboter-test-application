@@ -4,11 +4,12 @@ const config = require('../resources/config.json');
 const robota = require('../resources/robota.js');
 const path	= require('path');
 
-var sep = path.sep;
-
-var resourcePath	= __dirname + sep + '..' + sep + config.resourcePath ;
-
 var texte = [];
+
+function logger(funName, message){
+	var text = '[' + funName + ']' + message;
+	helper.log(text);
+}
 
 function getRandomMove(){
 	var random = Math.floor((Math.random() * 10) + 1);
@@ -42,23 +43,31 @@ function getRandomMove(){
 	return move;
 }
 
-var rsSerial	= new helper.runScript();
-rsSerial.start(resourcePath + sep +'serial.js');
+var rsSerial = new helper.runScript();
+rsSerial.start('../resources/serial.js');
 
 function finishThis(){
 	process.exit(0);
 }
 
+//serial State
 setInterval(function (){
-	var move = getRandomMove();
-    rsSerial.send(move);
+	var state = rsSerial.getState();
+	logger('serial State',state); //TODO get active state from serial
+	if(state == 'active'){
+		var move = getRandomMove();
+		rsSerial.send(move);
+	}
+    
 },2000);
 
+//serial recieve
 setInterval(function () {
-    var master = 'Master pid ['+process.pid+'] uptime '+ process.uptime()+'s <= ';
-    var recieve = rsSerial.recieve(); //returns an array of collected messages
-    recieve.forEach(function(r) {
-    	helper.log(master + r);
+    var master = 'pid ['+process.pid+'] uptime '+ process.uptime()+'s recived:';
+    logger('master', master);
+    var messages = rsSerial.getMessages(); //returns an array of collected messages
+    messages.forEach(function(m) {
+    	logger('serial recieve', m);
     });
 }, 1000);
 
