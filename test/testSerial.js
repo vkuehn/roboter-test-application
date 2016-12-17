@@ -2,12 +2,15 @@
 const helper = require('../node_modules/node-helper/node-helper');
 const config = require('../resources/config.json');
 const robota = require('../resources/robota.js');
+const state = require('../resources/state.js');
 const path	= require('path');
 
+var name = '[MASTER]';
+var serialState = state.noPort;
 var texte = [];
 
 function logger(funName, message){
-	var text = '[' + funName + ']' + message;
+	var text = name + '[' + funName + ']' + message;
 	helper.log(text);
 }
 
@@ -50,24 +53,25 @@ function finishThis(){
 	process.exit(0);
 }
 
-//serial State
+//serialState
 setInterval(function (){
-	var state = rsSerial.getState();
-	logger('serial State',state); //TODO get active state from serial
-	if(state == 'active'){
-		var move = getRandomMove();
+	rsSerial.send('debug=true');
+	var sState = rsSerial.getState();
+	logger('serialState',sState);
+	if(sState == 'connected'){
+		var move = getRandomMove() + '\n';
 		rsSerial.send(move);
 	}
     
-},2000);
+},3000);
 
-//serial recieve
+//getMessages
 setInterval(function () {
-    var master = 'pid ['+process.pid+'] uptime '+ process.uptime()+'s recived:';
-    logger('master', master);
+	var message = 'pid '+process.pid+' uptime '+ process.uptime()+'s';
+	logger('getMessages', message);
     var messages = rsSerial.getMessages(); //returns an array of collected messages
     messages.forEach(function(m) {
-    	logger('serial recieve', m);
+    	logger('getMessages', m);
     });
 }, 1000);
 

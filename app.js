@@ -8,19 +8,20 @@ var cookieParser = require('cookie-parser');
 var fs = require("fs");
 var logger = require('morgan');
 var path = require('path');
+var sep = path.sep;
 
-const helper = require('./node_modules/node-helper/node-helper');
-const config = require('./resources/config.json');
+const helper = require(__dirname + sep + 'node_modules' + sep + 'node-helper' + sep + 'node-helper');
+const config = require(__dirname + sep +'resources' + sep + 'config.json');
 
 //keep the order from here !
 var appName         = config.appName;
 var appNameShort	= config.appNameShort;
+var left			= config.left;
 var port			= config.port;
 var publicPath		= config.publicPath;
-var resourcePath	= __dirname + config.resourcePath;
-var left			= config.left;
 
-var robota		= require(resourcePath + '/' + appNameShort);
+var resourcePath	= __dirname + sep + config.resourcePath;
+var robota			= require(resourcePath + sep + appNameShort);
 
 //--server ---------------------------------------------------------------------
 var server = app.listen(port, function() {
