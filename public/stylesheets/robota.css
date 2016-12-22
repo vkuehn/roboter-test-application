@@ -3,6 +3,12 @@
  */
 @CHARSET "UTF-8";
 
+/*--icons are yellow per default----------------------*/
+.ui-icon {
+	font-size: 2.0em;
+	color: #f6931f;
+}
+
 /*--slider-------------------------*/
 #labelCurrentSet {
 	position: absolute;
@@ -49,10 +55,21 @@
 	color: #f6931f;
 	font-weight: bold;
 }
-/*--icons--------------------------*/
-.ui-icon {
-	font-size: 2.0em;
-	color: #f6931f;
+
+#serialConnection{
+	position: absolute;
+	top: 1em;
+	right: 2em;
+}
+
+#iconShutdown {
+	position: absolute;
+	top: 2em;
+	right: 1em;;
+}
+
+.ui-icon-power{
+	color: #ff0000;
 }
 
 #tableDirections {

@@ -141,6 +141,8 @@ process.on('disconnect',function() {
 });
 
 process.on('message', function(m) {
+	if(Boolean(m)){	m = 'debug=' + m; }
+	
 	var message = name +'recieved:' + m.trim();
 	process.send({ info: message });
 	

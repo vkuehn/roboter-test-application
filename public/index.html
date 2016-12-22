@@ -9,6 +9,8 @@
 
 <script	src="/javascripts/jquery-ui-1.12.1.custom/external/jquery/jquery.js"></script>
 <script src="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
 </head>
 <body>
 
@@ -29,9 +31,9 @@
 	<div id="tableDirections">
 		<table>
 			<tr>
-				<td><a id="turnLeft" class="ui-icon ui-icon-arrowreturn-1-w"><span>turnwest</span></a></td></td>
+				<td><a id="turnLeft" class="ui-icon ui-icon-arrowreturn-1-w"><span>turnwest</span></a></td>
 				<td><a id="moveForward" class="ui-icon ui-icon-arrow-1-n"><span>north</span></a></td>
-				<td><a id="turnRight" class="ui-icon ui-icon-arrowreturn-1-e"><span>turneast</span></a></td></td>
+				<td><a id="turnRight" class="ui-icon ui-icon-arrowreturn-1-e"><span>turneast</span></a></td>
 			</tr>
 			<tr>
 				<td><a id="moveLeft" class="ui-icon ui-icon-arrow-1-w"><span>west</span></a></td>
@@ -45,6 +47,14 @@
 			</tr>
 		</table>
 	</div>
+	
+	<!-- Serial Control -------------------------------------------------------->
+	<div id="serialConnection" class="ui-icon ui-icon-redo"></div>
+	
+	<!-- Shutdown Button -------------------------------------------------------->
+	<div id="iconShutdown">
+		<a href="/robota/api/doShutdown" class="ui-icon ui-icon-power">icon</a>
+	</div>
 
 	<script>
 		var appNameShort = 'robota';
@@ -52,6 +62,7 @@
 		
 		var left = { posYaw : 37, posPitch : 37 } //TODO in zentrale Konfig auslagern und auch in app laden
 		var center = { move: 'stop' }
+		var serial = { state: 'unknown' , command: 'connect' }
 		var textYaw = 'yaw';
 		var textPitch = 'pitch';
 
@@ -68,6 +79,8 @@
 			$("#moveBackward").click(function() { center.move ='backward';  doMove(center)} );
 			$("#turnLeft").click(function() { center.move ='turnLeft';  doMove(center)} );
 			$("#turnRight").click(function() { center.move ='turnRight';  doMove(center)} );
+			/*serial Connection*/
+			$("#serialConnection").click(function () { serialConnect() });
 		});
 
 		/*yaw slider*/
@@ -113,8 +126,19 @@
 			$.post(url + '/move', m).done( function(result) {	showMoveResult(result);	});
 		}
 
+		function serialConnect(){
+			document.getElementById("serialConnection").classList.add('rotate');
+			$.post(url + '/serial', serial).done(function(result) { showSerialState(result); });
+		}
+		
 		function showMoveResult(result){
 			$("#moveResult").val(result);
+		}
+		
+		function showSerialState(sState){
+			document.getElementById("serialConnection").classList.remove('rotate');
+			serial.state = sState;
+			console.log('Serial State = ' + serial.state)
 		}
 	</script>
 </body>

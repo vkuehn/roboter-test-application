@@ -6,5 +6,6 @@ module.exports ={
 	noConnect:	 	'NoConnect',
 	noPort:			'NoPort',
 	noPortOpen:		'NoOpenPort',
+	unknown:		'UnKnown',
 	ok: 			'OK'
 }
