@@ -2,7 +2,7 @@
 const helper = require('../node_modules/node-helper/node-helper');
 const config = require('../resources/config.json');
 const robota = require('../resources/robota.js');
-const state = require('../public/javascripts/state.json');
+const state = require('../public/state.json');
 const path	= require('path');
 
 var name = '[MASTER]';

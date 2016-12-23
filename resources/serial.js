@@ -12,7 +12,7 @@ var debug = false;
 var name = '[DEAMON_Serial]';
 var portsList = [];
 
-const state = require('../public/javascripts/state.json');
+const state = require('../public/state.json');
 
 var serialState = state.noPort;
 //==

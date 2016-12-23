@@ -49,7 +49,7 @@
 	</div>
 	
 	<!-- Serial Control -------------------------------------------------------->
-	<div id="serialConnection" class="ui-icon ui-icon-redo"></div>
+	<div id="serialConnection" class="ui-icon ui-icon-refresh"></div>
 	
 	<!-- Shutdown Button -------------------------------------------------------->
 	<div id="iconShutdown">
@@ -58,7 +58,7 @@
 
 	<script>
 		var state = '';
-	 	$.get('/javascripts/state.json', function(data) { state = data ; }); 
+	 	$.get('/state.json', function(data) { state = data ; }); 
 		var appNameShort = 'robota';
 		var url = '/' + appNameShort + '/api';
 		
@@ -82,8 +82,7 @@
 			document.getElementById("turnLeft").addEventListener("click",function(){     center.move ='turnLeft';  doMove(center)} );
 			document.getElementById("turnRight").addEventListener("click",function(){    center.move ='turnRight'; doMove(center)} );
 			/*serial Connection*/
-			document.getElementById("serialConnection").addEventListener("click",function () { serialConnect() });
-		});
+			document.getElementById("serialConnection").addEventListener("click",function () { getSerialConnectionState() })	});
 
 		/*yaw slider*/
 		$(function() {
@@ -133,44 +132,46 @@
 		}
 		
 		//-----Serial-----------------------------------------------------------------------------
-		function sleep(milliseconds) {
-		  var start = new Date().getTime();
-		  for (var i = 0; i < 1e7; i++) {
-		    if ((new Date().getTime() - start) > milliseconds){
-		      break;
-		    }
-		  }
-		}
-		
-		function serialConnect(){
-			document.getElementById("serialConnection").classList.add('rotate');
-			sleep(2000);
-			//getSerialConnection();
-			//document.getElementById("serialConnection").classList.remove('rotate');
-		}
-				
-		function getSerialConnection() {
-			var tries = 10;
-			while (tries >= 1) {
-				$.post(url + '/serial', serial).done(function(result) {
-					showSerialState(result); 
-					if(result == state.connected){ i = 1; }
-				});
-				sleep(1000);
-				tries--;
-			}
-		}
-		
-		function showSerialState(sState){			
-			serial.state = sState;
+		var elemSC = document.getElementById("serialConnection");
+		elemSC.classList.add('rotate');		
+		elemSC.classList.add('serialConnection');
 
-				if(sState == state.noConnect){
-					//document.getElementById("serialConnection").classList.remove('ui-icon');
-					document.getElementById("serialConnection").classList.add('serialNotConnected');
-				}
-			//TODO handle serial states
+		
+	//	setInterval(getSerialConnectionState(), 5);
+		setInterval(console.log('interval'), 5);
+		
+		function getSerialConnectionState() {
+				$.post(url + '/serial', serial).done(function(result) { serial.state = result; });
+				showSerialState();
+		}
+		
+		function showSerialState(){
+		
+			if(serial.state == state.connecting){
+				elemSC.classList.remove('serialNoConnect');
+				
+				elemSC.classList.add('serialConnected');
+			}
+			if(serial.state == state.connected){
+				elemSC.classList.remove('serialNoConnect');
+
+				elemSC.classList.add('serialConnected');
+			}		
+			if(serial.state == state.noConnect){
+				elemSC.classList.remove('serialConnected');
+				
+				elemSC.classList.add('serialNoConnect');
+			}
+			if(serial.state == state.noPort){
+				elemSC.classList.remove('serialConnected');
+				
+				elemSC.classList.add('serialNoConnect');
+			}
+			//TODO handle all serial states
 			console.log('Serial State = ' + serial.state)
 		}
+		
+		//---Serial End-----------------------------------------------------------------------------
 	</script>
 </body>
 </html>

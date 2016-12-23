@@ -10,8 +10,9 @@ var fs           = require("fs");
 var path         = require('path');
 var sep          = path.sep;
 
-const helper = require(__dirname + sep + 'node_modules' + sep + 'node-helper' + sep + 'node-helper');
 const config = require(__dirname + sep +'resources' + sep + 'config.json');
+const helper = require(__dirname + sep + 'node_modules' + sep + 'node-helper' + sep + 'node-helper');
+const robota = require(__dirname + sep +'resources' + sep + 'robota.js');
 
 //keep the order from here !
 var appName         = config.appName;
@@ -21,10 +22,9 @@ var left			= config.left;
 var port			= config.port;
 var publicPath		= config.publicPath;
 var resourcePath	= __dirname + sep + config.resourcePath;
-var robota			= require(resourcePath + sep + appNameShort);
 
 //--Serial--------------------------------------------------------------------
-const state		= require('./public/javascripts/state.json');
+const state		= require('./public/state.json');
 var   serialState = state.unknown;
 
 var rsSerial = new helper.runScript();
@@ -77,9 +77,12 @@ app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 app.post('/' + appNameShort + '/api/move',function (req, res) {
 	if(debug){logger('apiMove',req);}
 	var move = req.body.move;
-	//serial send
 	var m = robota.getLetter(move);
 	if(debug){logger('move',m);}
+	var moveResult = '';
+	if (move != ''  && move.length() == 1){
+		moveResult = rsSerial.send(moveResult);
+	}
 	res.send(JSON.stringify('moved ' + move));
 });
 
@@ -94,6 +97,11 @@ app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
 app.post('/' + appNameShort + '/api/serial',function (req, res) {
 	var sCommand = req.body.command;
 	if(debug){ logger('apiSerial', 'command:' + sCommand); }
+//	var c = robota.getLetter(sCommand);
+//	var cResult = '';
+//	if (move != ''  && move.length() == 1){
+//		moveResult = rsSerial.send(c);
+//	}
 	res.send(serialState);
 });
 
