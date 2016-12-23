@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <title>Roboter test application</title>
-<link href="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.css"	rel="stylesheet">
+<link href="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.css"	rel="stylesheet" />
 <link	href="/javascripts/jquery-ui-iconfont-master/jquery-ui.icon-font.css"	rel="stylesheet" type="text/css" />
-<link href="/stylesheets/robota.css" rel="stylesheet"	type="text/css" />
+<link href="/stylesheets/robota.css" rel="stylesheet"/>
 
 <script	src="/javascripts/jquery-ui-1.12.1.custom/external/jquery/jquery.js"></script>
 <script src="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
@@ -57,6 +57,8 @@
 	</div>
 
 	<script>
+		var state = '';
+	 	$.get('/javascripts/state.json', function(data) { state = data ; }); 
 		var appNameShort = 'robota';
 		var url = '/' + appNameShort + '/api';
 		
@@ -73,14 +75,14 @@
 			$("#labelPositionPitch").val(textYaw + " " + left.posYaw);
 			$("#positionPitch").val(textPitch + " " + left.posPitch);
 			/*set arrow functions*/
-			$("#moveLeft").click(function(){ center.move ='left';  doMove(center)} );
-			$("#moveForward").click(function(){ center.move ='forward';  doMove(center)} );
-			$("#moveRight").click(function() { center.move ='right';  doMove(center)} );
-			$("#moveBackward").click(function() { center.move ='backward';  doMove(center)} );
-			$("#turnLeft").click(function() { center.move ='turnLeft';  doMove(center)} );
-			$("#turnRight").click(function() { center.move ='turnRight';  doMove(center)} );
+			document.getElementById("moveLeft").addEventListener("click",function(){     center.move ='left';      doMove(center)} );
+			document.getElementById("moveForward").addEventListener("click",function(){  center.move ='forward';   doMove(center)} );
+			document.getElementById("moveRight").addEventListener("click",function(){    center.move ='right';     doMove(center)} );
+			document.getElementById("moveBackward").addEventListener("click",function(){ center.move ='backward';  doMove(center)} );
+			document.getElementById("turnLeft").addEventListener("click",function(){     center.move ='turnLeft';  doMove(center)} );
+			document.getElementById("turnRight").addEventListener("click",function(){    center.move ='turnRight'; doMove(center)} );
 			/*serial Connection*/
-			$("#serialConnection").click(function () { serialConnect() });
+			document.getElementById("serialConnection").addEventListener("click",function () { serialConnect() });
 		});
 
 		/*yaw slider*/
@@ -126,18 +128,46 @@
 			$.post(url + '/move', m).done( function(result) {	showMoveResult(result);	});
 		}
 
-		function serialConnect(){
-			document.getElementById("serialConnection").classList.add('rotate');
-			$.post(url + '/serial', serial).done(function(result) { showSerialState(result); });
-		}
-		
 		function showMoveResult(result){
 			$("#moveResult").val(result);
 		}
 		
-		function showSerialState(sState){
-			document.getElementById("serialConnection").classList.remove('rotate');
+		//-----Serial-----------------------------------------------------------------------------
+		function sleep(milliseconds) {
+		  var start = new Date().getTime();
+		  for (var i = 0; i < 1e7; i++) {
+		    if ((new Date().getTime() - start) > milliseconds){
+		      break;
+		    }
+		  }
+		}
+		
+		function serialConnect(){
+			document.getElementById("serialConnection").classList.add('rotate');
+			sleep(2000);
+			//getSerialConnection();
+			//document.getElementById("serialConnection").classList.remove('rotate');
+		}
+				
+		function getSerialConnection() {
+			var tries = 10;
+			while (tries >= 1) {
+				$.post(url + '/serial', serial).done(function(result) {
+					showSerialState(result); 
+					if(result == state.connected){ i = 1; }
+				});
+				sleep(1000);
+				tries--;
+			}
+		}
+		
+		function showSerialState(sState){			
 			serial.state = sState;
+
+				if(sState == state.noConnect){
+					//document.getElementById("serialConnection").classList.remove('ui-icon');
+					document.getElementById("serialConnection").classList.add('serialNotConnected');
+				}
 			//TODO handle serial states
 			console.log('Serial State = ' + serial.state)
 		}

@@ -24,12 +24,12 @@ var resourcePath	= __dirname + sep + config.resourcePath;
 var robota			= require(resourcePath + sep + appNameShort);
 
 //--Serial--------------------------------------------------------------------
-var state		= require(resourcePath + sep + 'state.js');
-var serialState = state.unknown;
+const state		= require('./public/javascripts/state.json');
+var   serialState = state.unknown;
 
 var rsSerial = new helper.runScript();
 rsSerial.start(resourcePath + sep + 'serial.js');
-//serialState
+//--maintain serialState
 setInterval(function (){
 	rsSerial.send(debug);
 	serialState = rsSerial.getState();
@@ -67,7 +67,7 @@ function logger(funName, message){
 }
 logger ('start','started');
 //==API's=======================================================================
-app.get('/' + appNameShort + '/doShutdown',function (req, res) {
+app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 	helper.log('shutdown by the User');
 	res.send(appName + ' is down');
 	finishThis();

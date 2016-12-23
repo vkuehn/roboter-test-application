@@ -12,9 +12,9 @@ var debug = false;
 var name = '[DEAMON_Serial]';
 var portsList = [];
 
-const state = require('./state');
-var serialState = state.noPort;
+const state = require('../public/javascripts/state.json');
 
+var serialState = state.noPort;
 //==
 function logger(funName, message){
 	var text = name + '[' + funName + '] ' + message;
