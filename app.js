@@ -66,9 +66,12 @@ function logger(funName, message){
 	helper.log(text);
 }
 logger ('start','started');
+function finishThis(){
+	process.exit(0);
+}
 //==API's=======================================================================
 app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
-	helper.log('shutdown by the User');
+	if(debug){logger('shutdown',' shutdown by the User');}
 	res.send(appName + ' is down');
 	finishThis();
 });
