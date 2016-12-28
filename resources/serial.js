@@ -58,8 +58,10 @@ function showPortClose() {
 function showPortOpen() {
 	if(serialState != state.connecting){
 		if(debug){logger('PortOpen','opened ' + portName )}
-		serialState = state.connected;
-		handleStateChange(serialState);
+		if(serialState != state.connected){
+			serialState = state.connected;
+			handleStateChange(serialState);		
+		}
 	}
 }
 
@@ -130,6 +132,7 @@ function writeToSerial(message){
 			    	 logger('writeToSerial', err.message);
 			    	 result = state.error;
 		    	 }
+		    	 serialState = state.error;
 		     }
 		});
 		
@@ -140,6 +143,7 @@ function writeToSerial(message){
 			info = info + 'send ' +  message.trim();
 		}
 		if(debug){logger('writeToSerial',info);}
+		handleStateChange(serialState);	
 }
 
 //==Deamon=====================================================================
