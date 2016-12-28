@@ -49,16 +49,20 @@ function getRandomMove(){
 var rsSerial = new helper.runScript();
 rsSerial.start('../resources/serial.js');
 
+
 function finishThis(){
 	process.exit(0);
 }
 
+setTimeout(function () {
+	rsSerial.send('debug=true');
+}, 100)
+
 //serialState
 setInterval(function (){
-	rsSerial.send('debug=true');
 	var sState = rsSerial.getState();
 	logger('serialState',sState);
-	if(sState == 'connected'){
+	if(sState == state.connected){
 		var move = getRandomMove() + '\n';
 		rsSerial.send(move);
 	}
@@ -67,14 +71,16 @@ setInterval(function (){
 
 //getMessages
 setInterval(function () {
-	var message = 'pid '+process.pid+' uptime '+ process.uptime()+'s';
-	logger('getMessages', message);
-    var messages = rsSerial.getMessages(); //returns an array of collected messages
-    messages.forEach(function(m) {
-    	logger('getMessages', m);
-    });
-}, 1000);
+	var rsMessages  = rsSerial.getMessages(); //returns an array of collected messages
+	if(typeof rsMessages !== 'undefined'){
+		rsMessages.forEach(function(m) {
+	    	logger('getMessages', m);
+	    });
+	}
+	var message = process.pid+' uptime '+ process.uptime()+'s';
+	logger('Pid', message + '\n');
+}, 2000);
 
 setTimeout(function () {
 	finishThis();
-}, 8000);
+}, 15000);

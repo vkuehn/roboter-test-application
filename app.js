@@ -100,12 +100,12 @@ app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
 app.post('/' + appNameShort + '/api/serial',function (req, res) {
 	var sCommand = req.body.command;
 	if(debug){ logger('apiSerial', 'command:' + sCommand); }
-//	var c = robota.getLetter(sCommand);
-//	var cResult = '';
-//	if (move != ''  && move.length() == 1){
-//		moveResult = rsSerial.send(c);
-//	}
-	res.send(serialState);
+	var c = robota.getLetter(sCommand);
+	var cResult = '';
+	if (move != ''  && move.length() == 1){
+		cResult = rsSerial.send(c);
+	}
+	res.send(cResult);
 });
 
 //==error handlers==============================================================
