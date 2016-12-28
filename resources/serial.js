@@ -45,8 +45,10 @@ function handleStateChange(newState){
 function serialRecieve(data) {
 	if(debug){logger('[serialRecieve]',data.toString())}
 	serialAnswer.push(data);
-	serialState = state.connected;
-	handleStateChange(serialState);
+	if(serialState != state.connected){
+		serialState = state.connected;
+		handleStateChange(serialState);		
+	}
 }
 
 function showPortClose() {
@@ -119,8 +121,7 @@ function getPort() {
 }
 
 function writeToSerial(message){
-		var result = '';
-		if(debug){logger('writeToSerial',message.trim());}
+		var result = '!';
 		myPort.write(message, function(err) {
 		     if (err) {
 		    	 if(err.message == 'Port is not open'){
@@ -131,9 +132,14 @@ function writeToSerial(message){
 		    	 }
 		     }
 		});
-		var message = '[writeToSerial]' +result;
-		process.send({ info: message });
 		
+		var info = '[writeToSerial]';
+		if(result != '!'){
+			info = info + result
+		}else{
+			info = info + 'send ' +  message.trim();
+		}
+		if(debug){logger('writeToSerial',info);}
 }
 
 //==Deamon=====================================================================
