@@ -113,7 +113,7 @@
 					$.post(url + '/eye/left', left).done(function(leftEye) {	showMyPositions(leftEye);	});
 				}
 			});
-		});
+		});		
 
 		function showMyPositions(myPositions) {
 			var positions = "";
@@ -136,9 +136,6 @@
 		elemSC.classList.add('rotate');		
 		elemSC.classList.add('serialConnection');
 
-		
-	//	setInterval(getSerialConnectionState(), 5);
-		setInterval(console.log('interval'), 5);
 		
 		function getSerialConnectionState() {
 				$.post(url + '/serial', serial).done(function(result) { serial.state = result; });

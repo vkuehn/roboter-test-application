@@ -2,8 +2,8 @@
   "appName": "roboter-test-application",
   "appNameShort": "robota",
   "appDataPath": "/data/",
-  "port": 8081,
-  "publicPath": "./public/",
+  "port": 8080,
+  "publicPath": "public",
   "resourcePath": "resources",
   "left": {
       "posPitch":37,

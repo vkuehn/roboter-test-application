@@ -1,74 +1,101 @@
 "use strict";
 
-var express      = require('express');
-var app          = express();
-var http         = require('http');
-var favicon      = require('serve-favicon');
-var cookieParser = require('cookie-parser');
-var fs           = require("fs");
-//var logger = require('morgan');
-var path         = require('path');
-var sep          = path.sep;
+const app		    = require('express')();
+const express 		= require('express');
+const favicon      	= require('serve-favicon');
+const http         	= require('http').Server(app);
+const io 			= require('socket.io')(http); 
+const cookieParser 	= require('cookie-parser');
+const path         	= require('path');
 
-const config = require(__dirname + sep +'resources' + sep + 'config.json');
+const sep          = path.sep;
+//
+const config = require(__dirname + sep + 'resources' + sep + 'config.json');
 const helper = require(__dirname + sep + 'node_modules' + sep + 'node-helper' + sep + 'node-helper');
-const robota = require(__dirname + sep +'resources' + sep + 'robota.js');
 
-//keep the order from here !
+//
+////keep the order from here !
 var appName         = config.appName;
 var appNameShort	= config.appNameShort;
 var debug 			= true;
 var left			= config.left;
 var port			= config.port;
-var publicPath		= config.publicPath;
-var resourcePath	= __dirname + sep + config.resourcePath;
+var publicPath		= __dirname + sep + config.publicPath + sep;
+var resourcePath	= __dirname + sep + config.resourcePath + sep;
 
-//--Serial--------------------------------------------------------------------
-const state		= require('./public/state.json');
-var   serialState = state.unknown;
+const state	 = require(publicPath + 'state.json');
+const robota = require(resourcePath + 'robota.js');
 
-var rsSerial = new helper.runScript();
-rsSerial.start(resourcePath + sep + 'serial.js');
-//--maintain serialState
-setInterval(function (){
-	rsSerial.send(debug);
-	serialState = rsSerial.getState();
-	if(debug){ logger('serialState',serialState); }
-	if(serialState == 'connected'){
-		// send move command
-	}
-},3000);
-//--server --------------------------------------------------------------------
-var server = app.listen(port, function() {
-	var host = server.address().address
-	var message = appName + ' app listening at http://' + host + ':' + port;
-	helper.log(message);
-});
-
-//--view engine setup-----------------------------------------------------------
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-app.use(favicon(path.join(__dirname, publicPath + 'images', 'favicon.ico')));
-//app.use(logger('dev'));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, publicPath)));
-
-//--json body parser-----------------------------------------
-const bodyParser = require('body-parser');
-app.use( bodyParser.json() );
-var urlencodedParser = app.use(bodyParser.urlencoded({
-  extended: false
-}));
+var serialState = state.unknown;
 
 //=============================================================================
 function logger(funName, message){
 	var text = '[' + appName + '][' + funName + ']' + message;
 	helper.log(text);
 }
-logger ('start','started');
+
 function finishThis(){
 	process.exit(0);
 }
+//--express -----------------------------------------------------------------
+//--do not change this !!------------------------------------------------------
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+app.use(favicon(path.join(publicPath, 'images', 'favicon.ico')));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+//--!!
+
+//--json body parser----------------------------------------------------------
+const bodyParser = require('body-parser');
+app.use( bodyParser.json() );
+var urlencodedParser = app.use(bodyParser.urlencoded({
+  extended: false
+}));
+
+app.get('/', function(req, res){
+	  res.sendFile(publicPath + sep + 'index.html');
+});
+
+
+http.listen(port, function(){
+	var host = http.address().address
+	var message = ' app listening at http://' + host + ':' + port;
+	helper.log(message);
+});
+
+
+//--Socket.io------------------------------------------------------------------
+io.on('connection', function (socket) {
+	if(debug){logger('socket.io', 'client Connected');}
+
+	if(debug){logger('socket.io', 'send to client Welcome');}
+	socket.emit('welcome', "Hello client");
+
+	socket.on('chat message', function (data) {
+		if(debug){logger('socket.io', 'recieved from client:' + data);}
+	});
+
+	setInterval(function (){
+		socket.emit('welcome', serialState);
+	},2501);
+});
+
+//--Serial--------------------------------------------------------------------
+var rsSerial = new helper.runScript();
+var serialLib = resourcePath +'serial.js';
+rsSerial.start(serialLib);
+
+setTimeout(function () {
+	rsSerial.send(debug);
+}, 100);
+
+//--maintain serialState
+setInterval(function (){
+	serialState = rsSerial.getState();
+	if(debug){ logger('serialState',serialState); }
+},3000);
+
 //==API's=======================================================================
 app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 	if(debug){logger('shutdown',' shutdown by the User');}
@@ -93,7 +120,6 @@ app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
 	left.posPitch = req.body.posPitch;
 	left.posYaw = req.body.posYaw;
 	//MQTT Update
-	//serial send
 	res.send(left);
 });
 
@@ -108,6 +134,8 @@ app.post('/' + appNameShort + '/api/serial',function (req, res) {
 	res.send(cResult);
 });
 
+//--
+logger ('start','started');
 //==error handlers==============================================================
 
 // catch 404 and forward to error handler
