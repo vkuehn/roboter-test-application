@@ -124,7 +124,8 @@
 		}
 
 		function doMove(m){
-			$.post(url + '/move', m).done( function(result) {	showMoveResult(result);	});
+			$.post(url + '/move', m).done( function(result) {	
+				showMoveResult(result);	});
 		}
 
 		function showMoveResult(result){

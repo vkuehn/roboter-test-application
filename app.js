@@ -19,6 +19,7 @@ var appName         = config.appName;
 var appNameShort	= config.appNameShort;
 var debug 			= true;
 var left			= config.left;
+var move			= config.move;
 var port			= config.port;
 var publicPath		= __dirname + sep + config.publicPath + sep;
 var resourcePath	= __dirname + sep + config.resourcePath + sep;
@@ -105,15 +106,18 @@ app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 
 //--API for robot----------------------------------------------------------------
 app.post('/' + appNameShort + '/api/move',function (req, res) {
-	if(debug){logger('apiMove',req);}
-	var move = req.body.move;
-	var m = robota.getLetter(move);
+	move.command = req.body.move;
+	if(debug){logger('apiMove','recieved move command' + move.command);}
+	var m = robota.getLetter(move.command);
 	if(debug){logger('move',m);}
-	var moveResult = '';
-	if (move != ''  && move.length() == 1){
-		moveResult = rsSerial.send(moveResult);
-	}
-	res.send(JSON.stringify('moved ' + move));
+	move.result = "none";
+	//TODO
+//	if (move.command != ''  && move.length() == 1 && serialState == state.connected){
+//		rsSerial.send(m);
+//		move.result = "send " + m;
+//	}
+	//res.send(JSON.stringify('moved ' + move));
+	res.send(move.result);
 });
 
 app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
