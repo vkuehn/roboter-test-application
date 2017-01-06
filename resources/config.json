@@ -8,5 +8,11 @@
   "left": {
       "posPitch":37,
       "posYaw":37
+  },
+  "move": {
+	  "command":	"none",
+	  "direction":	"none",
+	  "result":		"none"
+	  
   }
 }
