@@ -12,6 +12,7 @@ var message = "Num: ";
 var name = '[DEAMON_Serial]';
 var portName = 'none';
 var portsList = [];
+var portsListBad = [];
 var serialAnswer = [];
 
 const state = require('../public/state.json');
@@ -34,16 +35,13 @@ function wait(){
 	}
 }
 //==Serial Handling===========================================================
-//function handleSerialAnswer(){
-//	process.send({ info: message });
-//}
 
 function handleStateChange(newState){
 	process.send({ state: newState });	
 }
 
-function serialRecieve(data) {
-	if(debug){logger('[serialRecieve]',data.toString())}
+function eventSerialRecieve(data) {
+	if(debug){logger('eventSerialRecieve',data.toString())}
 	serialAnswer.push(data);
 	if(serialState != state.connected){
 		serialState = state.connected;
@@ -51,23 +49,36 @@ function serialRecieve(data) {
 	}
 }
 
-function showPortClose() {
-	if(debug){logger('PortClose','closed' + portName)}
+function eventPortClose() {
+	if(debug){logger('eventPortClose','closed' + portName)}
 }
 
-function showPortOpen() {
-	if(serialState != state.connecting){
-		if(debug){logger('PortOpen','opened ' + portName )}
-		if(serialState != state.connected){
-			serialState = state.connected;
-			handleStateChange(serialState);		
-		}
-	}
+function eventSerialPortOpen() {
+	if(debug){logger('eventSerialPortOpen',serialState)}
+//	if(serialState != state.connecting){
+//		if(debug){logger('PortOpen','opened ' + portName )}
+//		if(serialState != state.connected){
+//			serialState = state.connecting;
+//			handleStateChange(serialState);		
+//		}
+//	}else{
+	if(!isBadPort()){
+		writeToSerial('?');
+	}		
 }
 
-function showError(error) {
+function eventSerialError(error) {
 	serialState = state.error;
-	logger('SerialError',error);
+	logger('eventSerialError',error + ' on Port ' + portName);
+	portsListBad.push(portName);
+}
+
+function isBadPort(){
+	if(portsListBad.indexOf(portName) != -1){
+		return false;
+	}else{
+		return true;
+	}
 }
 
 function portIsInList(portComName){
@@ -85,7 +96,7 @@ function getPortsList(){
 			}
 		});
 	});
-	if(debug){logger('getPortsList', portsList);}
+	if(debug){logger('getPortsList', portsList.length);}
 };
 
 function getPort() {
@@ -102,20 +113,14 @@ function getPort() {
 				myPort = new SerialPort(port, {
 					baudRate: baud, parser: serialport.parsers.readline("\n")
 				});
-				myPort.on('open', showPortOpen);
-				myPort.on('data', serialRecieve);
-				myPort.on('close', showPortClose);
-				myPort.on('error', showError);
+				myPort.on('open', eventSerialPortOpen);
+				myPort.on('data', eventSerialRecieve);
+				myPort.on('close', eventPortClose);
+				myPort.on('error', eventSerialError);
+				wait();
 				//we get the right port from PortOpen event
 			}catch (err){
 				if(debug){logger('getPort','failed with ' + err);}
-			}
-			if(debug){
-				if(serialState == state.connected){
-					logger('getPort','connected to ' + port);
-				}else{
-					logger('getPort', serialState);	
-				}
 			}
 		});
 		handleStateChange(serialState);	
@@ -123,27 +128,23 @@ function getPort() {
 }
 
 function writeToSerial(message){
-		var result = '!';
+	if(!isBadPort()){
 		myPort.write(message, function(err) {
 		     if (err) {
 		    	 if(err.message == 'Port is not open'){
-		    		 result = state.noPortOpen;
+		    		 serialState = state.noPortOpen;
 		    	 }else {
-			    	 logger('writeToSerial', err.message);
-			    	 result = state.error;
+		    		 serialState = state.error;
 		    	 }
-		    	 serialState = state.error;
 		     }
 		});
-		
-		var info = '[writeToSerial]';
-		if(result != '!'){
-			info = info + result
-		}else{
-			info = info + 'send ' +  message.trim();
+			if(serialState == state.noPortOpe || serialState == state.error){
+			portsListBad.push(portName);
 		}
-		if(debug){logger('writeToSerial',info);}
-		handleStateChange(serialState);	
+		if(debug){logger('writeToSerial','serialState:' + serialState);}		
+	}else{
+		if(debug){logger('writeToSerial','badPort serialState:' + serialState);}	
+	}
 }
 
 //==Deamon=====================================================================
@@ -161,7 +162,7 @@ Serial.prototype.start = function () {
 Serial.prototype.checkState = function () {
 	this.uptime = process.uptime();
 	var message = name +'pid '+this.pid+' uptime '+ this.uptime+'s';
-	if(serialState != state.connected){getPort();}	
+	if(serialState != state.connected && serialState != state.unknown ){ getPort();}	
 	process.send({ info: message });
 };
 

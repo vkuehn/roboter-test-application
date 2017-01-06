@@ -1,4 +1,4 @@
-
+"use strict";
 const helper = require('../node_modules/node-helper/node-helper');
 const config = require('../resources/config.json');
 const robota = require('../resources/robota.js');
@@ -48,7 +48,6 @@ function getRandomMove(){
 
 var rsSerial = new helper.runScript();
 rsSerial.start('../resources/serial.js');
-
 
 function finishThis(){
 	process.exit(0);
