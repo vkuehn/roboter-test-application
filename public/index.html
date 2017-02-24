@@ -139,8 +139,10 @@
 
 		
 		function getSerialConnectionState() {
-				$.post(url + '/serial', serial).done(function(result) { serial.state = result; });
-				showSerialState();
+				$.post(url + '/serial', serial).done( function(result) { 
+					serial.state = result;
+					showSerialState();
+					});
 		}
 		
 		function showSerialState(){

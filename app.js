@@ -65,7 +65,7 @@ http.listen(port, function(){
 	helper.log(message);
 });
 
-
+helper.log('to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
 //--Socket.io------------------------------------------------------------------
 io.on('connection', function (socket) {
 	if(debug){logger('socket.io', 'client Connected');}
@@ -83,19 +83,19 @@ io.on('connection', function (socket) {
 });
 
 //--Serial--------------------------------------------------------------------
-var rsSerial = new helper.runScript();
-var serialLib = resourcePath +'serial.js';
-rsSerial.start(serialLib);
-
-setTimeout(function () {
-	rsSerial.send(debug);
-}, 100);
-
-//--maintain serialState
-setInterval(function (){
-	serialState = rsSerial.getState();
-	if(debug){ logger('serialState',serialState); }
-},3000);
+//var rsSerial = new helper.runScript();
+//var serialLib = resourcePath +'serial.js';
+//// todo  wieder aktivieren wenn status eindeutrig angezeigt werden kann rsSerial.start(serialLib);
+//
+//setTimeout(function () {
+//	rsSerial.send(debug);
+//}, 100);
+//
+////--maintain serialState
+//setInterval(function (){
+//	serialState = rsSerial.getState();
+//	if(debug){ logger('serialState',serialState); }
+//},3000);
 
 //==API's=======================================================================
 app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
@@ -107,7 +107,7 @@ app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 //--API for robot----------------------------------------------------------------
 app.post('/' + appNameShort + '/api/move',function (req, res) {
 	move.command = req.body.move;
-	if(debug){logger('apiMove','recieved move command' + move.command);}
+	if(debug){logger('apiMove','recieved move command ' + move.command);}
 	var m = robota.getLetter(move.command);
 	if(debug){logger('move',m);}
 	move.result = "none";
