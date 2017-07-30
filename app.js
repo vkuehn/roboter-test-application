@@ -115,13 +115,13 @@ app.post('/' + appNameShort + '/api/move',function (req, res) {
 	if(debug){logger('apiMove','recieved move command ' + move.command);}
 	var m = robota.getLetter(move.command);
 	if(debug){logger('move',m);}
-	move.result = "none";
 	//TODO
 //	if (move.command != ''  && move.length() == 1 && serialState == state.connected){
 //		rsSerial.send(m);
 //		move.result = "send " + m;
 //	}
 	//res.send(JSON.stringify('moved ' + move));
+  move.result = move.command;
 	res.send(move.result);
 });
 
