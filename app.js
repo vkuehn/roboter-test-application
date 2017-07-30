@@ -1,26 +1,26 @@
 "use strict";
 
-const app		    = require('express')();
-const express 		= require('express');
+const app		    		= require('express')();
+const debug					= require('debug')('ras');
+const express 			= require('express');
 const favicon      	= require('serve-favicon');
 const http         	= require('http').Server(app);
-const io 			= require('socket.io')(http); 
+const io 						= require('socket.io')(http);
 const cookieParser 	= require('cookie-parser');
 const path         	= require('path');
 
-const sep          = path.sep;
 //
+const sep    = path.sep;
 const config = require(__dirname + sep + 'resources' + sep + 'config.json');
 const helper = require(__dirname + sep + 'node_modules' + sep + 'node-helper' + sep + 'node-helper');
 
 //
 ////keep the order from here !
-var appName         = config.appName;
+var appName       = config.appName;
 var appNameShort	= config.appNameShort;
-var debug 			= true;
-var left			= config.left;
-var move			= config.move;
-var port			= config.port;
+var left			    = config.left;
+var move			    = config.move;
+var port			    = config.port;
 var publicPath		= __dirname + sep + config.publicPath + sep;
 var resourcePath	= __dirname + sep + config.resourcePath + sep;
 
@@ -32,7 +32,7 @@ var serialState = state.unknown;
 //=============================================================================
 function logger(funName, message){
 	var text = '[' + appName + '][' + funName + ']' + message;
-	helper.log(text);
+	debug(text);
 }
 
 function finishThis(){
@@ -62,10 +62,15 @@ app.get('/', function(req, res){
 http.listen(port, function(){
 	var host = http.address().address
 	var message = ' app listening at http://' + host + ':' + port;
-	helper.log(message);
+	debug(message);
 });
 
-helper.log('to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
+if (debug){
+  debug('starting %s', appName);
+}else{
+  console.log('to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
+}
+
 //--Socket.io------------------------------------------------------------------
 io.on('connection', function (socket) {
 	if(debug){logger('socket.io', 'client Connected');}

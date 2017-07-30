@@ -3,11 +3,15 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+#Intelli Jea
+.idea/
+
 #eclipse Config Files #
 .classpath
 .project
 .settings
 .metadata
+
 #outputfolder
 /target
 /results
@@ -26,11 +30,9 @@ pids
 *.pid
 *.seed
 *.pid.lock
-*.seed
 *.csv
 *.dat
 *.out
-*.pid
 *.gz
 *.*~
 
