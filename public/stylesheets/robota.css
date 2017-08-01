@@ -56,10 +56,18 @@
 	font-weight: bold;
 }
 
-#serialConnection{
+.serialConnection{
 	position: absolute;
 	top: 1em;
 	right: 2em;
+}
+
+.serialNoConnect{
+	color: #ff0000;
+}
+
+.serialConnected{
+	color: #00ff00;
 }
 
 #iconShutdown {

@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <title>Roboter test application</title>
-<link href="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.css"	rel="stylesheet">
+<link href="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.css"	rel="stylesheet" />
 <link	href="/javascripts/jquery-ui-iconfont-master/jquery-ui.icon-font.css"	rel="stylesheet" type="text/css" />
-<link href="/stylesheets/robota.css" rel="stylesheet"	type="text/css" />
+<link href="/stylesheets/robota.css" rel="stylesheet"/>
 
 <script	src="/javascripts/jquery-ui-1.12.1.custom/external/jquery/jquery.js"></script>
 <script src="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
@@ -31,25 +31,25 @@
 	<div id="tableDirections">
 		<table>
 			<tr>
-				<td><a id="turnLeft" class="ui-icon ui-icon-arrowreturn-1-w"><span>turnwest</span></a></td>
-				<td><a id="moveForward" class="ui-icon ui-icon-arrow-1-n"><span>north</span></a></td>
-				<td><a id="turnRight" class="ui-icon ui-icon-arrowreturn-1-e"><span>turneast</span></a></td>
+				<td><a id="turnLeft" class="ui-icon ui-icon-arrowreturn-1-w"><span>turnleft</span></a></td>
+				<td><a id="moveForward" class="ui-icon ui-icon-arrow-1-n"><span>forward</span></a></td>
+				<td><a id="turnRight" class="ui-icon ui-icon-arrowreturn-1-e"><span>turnright</span></a></td>
 			</tr>
 			<tr>
-				<td><a id="moveLeft" class="ui-icon ui-icon-arrow-1-w"><span>west</span></a></td>
+				<td><a id="moveLeft" class="ui-icon ui-icon-arrow-1-w"><span>moveleft</span></a></td>
 				<td></td>
-				<td><a id="moveRight" class="ui-icon ui-icon-arrow-1-e"><span>east</span></a></td>
+				<td><a id="moveRight" class="ui-icon ui-icon-arrow-1-e"><span>moveright</span></a></td>
 			</tr>
 						<tr>
 				<td></td>
-				<td><a id="moveBackward" class="ui-icon ui-icon-arrow-1-s"><span>south</span></a></td>
+				<td><a id="moveBackward" class="ui-icon ui-icon-arrow-1-s"><span>moveback</span></a></td>
 				<td></td>
 			</tr>
 		</table>
 	</div>
 	
 	<!-- Serial Control -------------------------------------------------------->
-	<div id="serialConnection" class="ui-icon ui-icon-redo"></div>
+	<div id="serialConnection" class="ui-icon ui-icon-refresh">Serial Connection</div>
 	
 	<!-- Shutdown Button -------------------------------------------------------->
 	<div id="iconShutdown">
@@ -57,6 +57,8 @@
 	</div>
 
 	<script>
+		var state = '';
+	 	$.get('/state.json', function(data) { state = data ; }); 
 		var appNameShort = 'robota';
 		var url = '/' + appNameShort + '/api';
 		
@@ -73,15 +75,14 @@
 			$("#labelPositionPitch").val(textYaw + " " + left.posYaw);
 			$("#positionPitch").val(textPitch + " " + left.posPitch);
 			/*set arrow functions*/
-			$("#moveLeft").click(function(){ center.move ='left';  doMove(center)} );
-			$("#moveForward").click(function(){ center.move ='forward';  doMove(center)} );
-			$("#moveRight").click(function() { center.move ='right';  doMove(center)} );
-			$("#moveBackward").click(function() { center.move ='backward';  doMove(center)} );
-			$("#turnLeft").click(function() { center.move ='turnLeft';  doMove(center)} );
-			$("#turnRight").click(function() { center.move ='turnRight';  doMove(center)} );
+			document.getElementById("moveLeft").addEventListener("click",function(){     center.move ='left';      doMove(center)} );
+			document.getElementById("moveForward").addEventListener("click",function(){  center.move ='forward';   doMove(center)} );
+			document.getElementById("moveRight").addEventListener("click",function(){    center.move ='right';     doMove(center)} );
+			document.getElementById("moveBackward").addEventListener("click",function(){ center.move ='backward';  doMove(center)} );
+			document.getElementById("turnLeft").addEventListener("click",function(){     center.move ='turnLeft';  doMove(center)} );
+			document.getElementById("turnRight").addEventListener("click",function(){    center.move ='turnRight'; doMove(center)} );
 			/*serial Connection*/
-			$("#serialConnection").click(function () { serialConnect() });
-		});
+			document.getElementById("serialConnection").addEventListener("click",function () { getSerialConnectionState() })	});
 
 		/*yaw slider*/
 		$(function() {
@@ -112,7 +113,7 @@
 					$.post(url + '/eye/left', left).done(function(leftEye) {	showMyPositions(leftEye);	});
 				}
 			});
-		});
+		});		
 
 		function showMyPositions(myPositions) {
 			var positions = "";
@@ -123,24 +124,54 @@
 		}
 
 		function doMove(m){
-			$.post(url + '/move', m).done( function(result) {	showMoveResult(result);	});
+			$.post(url + '/move', m).done( function(result) {	
+				showMoveResult(result);	});
 		}
 
-		function serialConnect(){
-			document.getElementById("serialConnection").classList.add('rotate');
-			$.post(url + '/serial', serial).done(function(result) { showSerialState(result); });
-		}
-		
 		function showMoveResult(result){
 			$("#moveResult").val(result);
 		}
 		
-		function showSerialState(sState){
-			document.getElementById("serialConnection").classList.remove('rotate');
-			serial.state = sState;
-			//TODO handle serial states
+		//-----Serial-----------------------------------------------------------------------------
+		var elemSC = document.getElementById("serialConnection");
+		//elemSC.classList.add('rotate');		
+		elemSC.classList.add('serialConnection');
+
+		
+		function getSerialConnectionState() {
+				$.post(url + '/serial', serial).done( function(result) { 
+					serial.state = result;
+					showSerialState();
+					});
+		}
+		
+		function showSerialState(){
+		
+			if(serial.state == state.connecting){
+				elemSC.classList.remove('serialNoConnect');
+				
+				elemSC.classList.add('serialConnected');
+			}
+			if(serial.state == state.connected){
+				elemSC.classList.remove('serialNoConnect');
+
+				elemSC.classList.add('serialConnected');
+			}		
+			if(serial.state == state.noConnect){
+				elemSC.classList.remove('serialConnected');
+				
+				elemSC.classList.add('serialNoConnect');
+			}
+			if(serial.state == state.noPort){
+				elemSC.classList.remove('serialConnected');
+				
+				elemSC.classList.add('serialNoConnect');
+			}
+			//TODO handle all serial states
 			console.log('Serial State = ' + serial.state)
 		}
+		
+		//---Serial End-----------------------------------------------------------------------------
 	</script>
 </body>
 </html>

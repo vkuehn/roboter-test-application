@@ -1,102 +1,150 @@
 "use strict";
 
-var express      = require('express');
-var app          = express();
-var http         = require('http');
-var favicon      = require('serve-favicon');
-var cookieParser = require('cookie-parser');
-var fs           = require("fs");
-//var logger = require('morgan');
-var path         = require('path');
-var sep          = path.sep;
+const app		    		= require('express')();
+const debug					= require('debug')('ras');
+const express 			= require('express');
+const favicon      	= require('serve-favicon');
+const http         	= require('http').Server(app);
+const io 						= require('socket.io')(http);
+const cookieParser 	= require('cookie-parser');
+const path         	= require('path');
 
+//
+const sep    = path.sep;
+const config = require(__dirname + sep + 'resources' + sep + 'config.json');
 const helper = require(__dirname + sep + 'node_modules' + sep + 'node-helper' + sep + 'node-helper');
-const config = require(__dirname + sep +'resources' + sep + 'config.json');
 
-//keep the order from here !
-var appName         = config.appName;
+//
+////keep the order from here !
+var appName       = config.appName;
 var appNameShort	= config.appNameShort;
-var debug 			= true;
-var left			= config.left;
-var port			= config.port;
-var publicPath		= config.publicPath;
-var resourcePath	= __dirname + sep + config.resourcePath;
-var robota			= require(resourcePath + sep + appNameShort);
+var left			    = config.left;
+var move			    = config.move;
+var port			    = config.port;
+var publicPath		= __dirname + sep + config.publicPath + sep;
+var resourcePath	= __dirname + sep + config.resourcePath + sep;
 
-//--Serial--------------------------------------------------------------------
-var state		= require(resourcePath + sep + 'state.js');
+const state	 = require(publicPath + 'state.json');
+const robota = require(resourcePath + 'robota.js');
+
 var serialState = state.unknown;
 
-var rsSerial = new helper.runScript();
-rsSerial.start(resourcePath + sep + 'serial.js');
-//serialState
-setInterval(function (){
-	rsSerial.send(debug);
-	serialState = rsSerial.getState();
-	if(debug){ logger('serialState',serialState); }
-	if(serialState == 'connected'){
-		// send move command
-	}
-},3000);
-//--server --------------------------------------------------------------------
-var server = app.listen(port, function() {
-	var host = server.address().address
-	var message = appName + ' app listening at http://' + host + ':' + port;
-	helper.log(message);
-});
+//=============================================================================
+function logger(funName, message){
+	var text = '[' + appName + '][' + funName + ']' + message;
+	debug(text);
+}
 
-//--view engine setup-----------------------------------------------------------
+function finishThis(){
+	process.exit(0);
+}
+//--express -----------------------------------------------------------------
+//--do not change this !!------------------------------------------------------
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(favicon(path.join(__dirname, publicPath + 'images', 'favicon.ico')));
-//app.use(logger('dev'));
+app.use(favicon(path.join(publicPath, 'images', 'favicon.ico')));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, publicPath)));
+app.use(express.static(path.join(__dirname, 'public')));
+//--!!
 
-//--json body parser-----------------------------------------
+//--json body parser----------------------------------------------------------
 const bodyParser = require('body-parser');
 app.use( bodyParser.json() );
 var urlencodedParser = app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-//=============================================================================
-function logger(funName, message){
-	var text = '[' + appName + '][' + funName + ']' + message;
-	helper.log(text);
+app.get('/', function(req, res){
+	  res.sendFile(publicPath + sep + 'index.html');
+});
+
+
+http.listen(port, function(){
+	var host = http.address().address
+	var message = ' app listening at http://' + host + ':' + port;
+	debug(message);
+});
+
+if (debug){
+  debug('starting %s', appName);
+}else{
+  console.log('to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
 }
-logger ('start','started');
+
+//--Socket.io------------------------------------------------------------------
+io.on('connection', function (socket) {
+	if(debug){logger('socket.io', 'client Connected');}
+
+	if(debug){logger('socket.io', 'send to client Welcome');}
+	socket.emit('welcome', "Hello client");
+
+	socket.on('chat message', function (data) {
+		if(debug){logger('socket.io', 'recieved from client:' + data);}
+	});
+
+	setInterval(function (){
+		socket.emit('welcome', serialState);
+	},2501);
+});
+
+//--Serial--------------------------------------------------------------------
+//var rsSerial = new helper.runScript();
+//var serialLib = resourcePath +'serial.js';
+//// todo  wieder aktivieren wenn status eindeutrig angezeigt werden kann rsSerial.start(serialLib);
+//
+//setTimeout(function () {
+//	rsSerial.send(debug);
+//}, 100);
+//
+////--maintain serialState
+//setInterval(function (){
+//	serialState = rsSerial.getState();
+//	if(debug){ logger('serialState',serialState); }
+//},3000);
+
 //==API's=======================================================================
-app.get('/' + appNameShort + '/doShutdown',function (req, res) {
-	helper.log('shutdown by the User');
+app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
+	if(debug){logger('shutdown',' shutdown by the User');}
 	res.send(appName + ' is down');
 	finishThis();
 });
 
 //--API for robot----------------------------------------------------------------
 app.post('/' + appNameShort + '/api/move',function (req, res) {
-	if(debug){logger('apiMove',req);}
-	var move = req.body.move;
-	//serial send
-	var m = robota.getLetter(move);
+	move.command = req.body.move;
+	if(debug){logger('apiMove','recieved move command ' + move.command);}
+	var m = robota.getLetter(move.command);
 	if(debug){logger('move',m);}
-	res.send(JSON.stringify('moved ' + move));
+	//TODO
+//	if (move.command != ''  && move.length() == 1 && serialState == state.connected){
+//		rsSerial.send(m);
+//		move.result = "send " + m;
+//	}
+	//res.send(JSON.stringify('moved ' + move));
+  move.result = move.command;
+	res.send(move.result);
 });
 
 app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
 	left.posPitch = req.body.posPitch;
 	left.posYaw = req.body.posYaw;
 	//MQTT Update
-	//serial send
 	res.send(left);
 });
 
 app.post('/' + appNameShort + '/api/serial',function (req, res) {
 	var sCommand = req.body.command;
 	if(debug){ logger('apiSerial', 'command:' + sCommand); }
-	res.send(serialState);
+	var c = robota.getLetter(sCommand);
+	var cResult = '';
+	if (move != ''  && move.length() == 1){
+		cResult = rsSerial.send(c);
+	}
+	res.send(cResult);
 });
 
+//--
+logger ('start','started');
 //==error handlers==============================================================
 
 // catch 404 and forward to error handler

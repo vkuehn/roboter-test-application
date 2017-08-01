@@ -6,39 +6,79 @@ var serialport = require('serialport');
 var SerialPort = serialport.SerialPort;
 var myPort;
 
-var message = "Num: ";
 var baud = 19200;
 var debug = false;
+var message = "Num: ";
 var name = '[DEAMON_Serial]';
+var portName = 'none';
 var portsList = [];
+var portsListBad = [];
+var serialAnswer = [];
 
-const state = require('./state');
+const state = require('../public/state.json');
+
 var serialState = state.noPort;
-
 //==
 function logger(funName, message){
 	var text = name + '[' + funName + '] ' + message;
 	process.send({ info: text });
 }
+
+function wait(){
+	var milliseconds = 100;
+	var start = new Date().getTime();
+	var timer = true;
+	while (timer) {
+		if ((new Date().getTime() - start)> milliseconds) {
+			timer = false;
+		}
+	}
+}
 //==Serial Handling===========================================================
 
-function showPortOpen() {
-	process.send({ state: serialState });
+function handleStateChange(newState){
+	process.send({ state: newState });	
 }
-	 
-function serialRecieve(data) {
-	var message = name + '[serialRecieve]' + data.toString();
-	process.send({ info: message });
+
+function eventSerialRecieve(data) {
+	if(debug){logger('eventSerialRecieve',data.toString())}
+	serialAnswer.push(data);
+	if(serialState != state.connected){
+		serialState = state.connected;
+		handleStateChange(serialState);		
+	}
 }
-	 
-function showPortClose() {
-	var message = 'port closed.';
-	process.send({ info: message });
+
+function eventPortClose() {
+	if(debug){logger('eventPortClose','closed' + portName)}
 }
-	 
-function showError(error) {
+
+function eventSerialPortOpen() {
+	if(debug){logger('eventSerialPortOpen',serialState)}
+//	if(serialState != state.connecting){
+//		if(debug){logger('PortOpen','opened ' + portName )}
+//		if(serialState != state.connected){
+//			serialState = state.connecting;
+//			handleStateChange(serialState);		
+//		}
+//	}else{
+	if(!isBadPort()){
+		writeToSerial('?');
+	}		
+}
+
+function eventSerialError(error) {
 	serialState = state.error;
-	if(debug){logger('SerialError',error);}
+	logger('eventSerialError',error + ' on Port ' + portName);
+	portsListBad.push(portName);
+}
+
+function isBadPort(){
+	if(portsListBad.indexOf(portName) != -1){
+		return false;
+	}else{
+		return true;
+	}
 }
 
 function portIsInList(portComName){
@@ -56,83 +96,73 @@ function getPortsList(){
 			}
 		});
 	});
-	if(debug){logger('getPortsList', portsList);}
+	if(debug){logger('getPortsList', portsList.length);}
 };
 
 function getPort() {
 	if(debug){logger('getPort','state ' + serialState);}
-
 	if(serialState == state.noPort){
 		getPortsList();
 		serialState = state.noConnect;
 	}
-
 	if(serialState == state.noConnect){
 		portsList.forEach(function (port){
 			if(debug){logger('getPort','check port ' + port);}
 			try{
+				portName = port;
 				myPort = new SerialPort(port, {
 					baudRate: baud, parser: serialport.parsers.readline("\n")
 				});
-				myPort.on('open', showPortOpen);
-				myPort.on('data', serialRecieve);
-				myPort.on('close', showPortClose);
-				myPort.on('error', showError);
-				var writeResult = writeToSerial('?');
-				if(writeResult == state.ok){
-					serialState = state.connected;					
-				}else {
-					serialState = state.noConnect;
-				}
+				myPort.on('open', eventSerialPortOpen);
+				myPort.on('data', eventSerialRecieve);
+				myPort.on('close', eventPortClose);
+				myPort.on('error', eventSerialError);
+				wait();
+				//we get the right port from PortOpen event
 			}catch (err){
 				if(debug){logger('getPort','failed with ' + err);}
 			}
-			
 		});
-		process.send({ state: serialState });
-		if(debug){
-			if(serialState == state.connected){
-				logger('getPort','connected to ' + port);
-			}else{
-				logger('getPort', serialState);	
-			}
-		}	
+		handleStateChange(serialState);	
 	}
 }
 
-function writeToSerial(message)
-{
-	var result = state.noAnswer;
-	if(debug){logger('writeToSerial',message.trim());}
-	myPort.write(message, function(err) {
-	     if (err) {
-	    	 if(err.message == 'Port is not open'){
-	    		 result.noPortOpen;
-	    	 }else {
-		    	 logger('writeToSerial', err.message);
-		    	 result = state.error;
-	    	 }
-	     }
-	});
-	return result;
+function writeToSerial(message){
+	if(!isBadPort()){
+		myPort.write(message, function(err) {
+		     if (err) {
+		    	 if(err.message == 'Port is not open'){
+		    		 serialState = state.noPortOpen;
+		    	 }else {
+		    		 serialState = state.error;
+		    	 }
+		     }
+		});
+			if(serialState == state.noPortOpe || serialState == state.error){
+			portsListBad.push(portName);
+		}
+		if(debug){logger('writeToSerial','serialState:' + serialState);}		
+	}else{
+		if(debug){logger('writeToSerial','badPort serialState:' + serialState);}	
+	}
 }
 
 //==Deamon=====================================================================
 var Serial = {};
 module.exports = Serial = function ()  {
-    this.Delay = 1000;
+    this.updateCycle = 3000;
 	this.pid = process.pid;
 }
 
 Serial.prototype.start = function () {
 	process.send({ state: serialState });
-	setInterval(this.sendMessageToMaster.bind(this),this.Delay);
+	setInterval(this.checkState,this.updateCycle);
 };
 
-Serial.prototype.sendMessageToMaster = function () {
+Serial.prototype.checkState = function () {
 	this.uptime = process.uptime();
 	var message = name +'pid '+this.pid+' uptime '+ this.uptime+'s';
-	if(serialState != state.connected){getPort();}	
+	if(serialState != state.connected && serialState != state.unknown ){ getPort();}	
 	process.send({ info: message });
 };
 
@@ -140,20 +170,21 @@ process.on('disconnect',function() {
 	process.exit(0);
 });
 
-process.on('message', function(m) {
-	if(Boolean(m)){	m = 'debug=' + m; }
+process.on('message', function(pM) {
+	if(typeof(pM) === "boolean"){ pM = 'debug=' + pM; }
 	
-	var message = name +'recieved:' + m.trim();
+	var message = name +'recieved:' + pM.trim();
 	process.send({ info: message });
 	
-	if(m.toString() === 'kill'){
+	if(pM.toString() === 'kill'){
 		serialState = state.end;
+		handleStateChange(serialState);
 		process.exit(0);
 	}
-	if(m.toString().startsWith('debug')){
-		debug = m.split('=')[1];
+	if(pM.toString().startsWith('debug')){
+		debug = pM.split('=')[1];
 	}else if (serialState == state.connected){
-		writeToSerial(m);
+		writeToSerial(pM);
 	}
 });
 
