@@ -32,7 +32,7 @@ var serialState = state.unknown;
 //=============================================================================
 function logger(funName, message){
 	var text = '[' + appName + '][' + funName + ']' + message;
-	debug(text);
+	console.log(text);
 }
 
 function finishThis(){
@@ -58,17 +58,14 @@ app.get('/', function(req, res){
 	  res.sendFile(publicPath + sep + 'index.html');
 });
 
-
 http.listen(port, function(){
 	var host = http.address().address
 	var message = ' app listening at http://' + host + ':' + port;
 	debug(message);
 });
 
-if (debug){
-  debug('starting %s', appName);
-}else{
-  console.log('to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
+logger('','starting '+ appName);
+logger('','to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
 }
 
 //--Socket.io------------------------------------------------------------------

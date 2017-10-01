@@ -2,20 +2,26 @@
  roboter test application (robota) style sheet
  */
 @CHARSET "UTF-8";
-
-/*--icons are yellow per default----------------------*/
+/*--default------------------------*/
 .ui-icon {
 	font-size: 2.0em;
 	color: #f6931f;
+	border: 0;
+	opacity: 0.5;
 }
-
+input[type="text"]
+{
+	width: 50px;
+	border: 0;
+	color: #f6931f;
+	font-weight: bold;
+}
 /*--slider-------------------------*/
-#labelCurrentSet {
+#labelCurrentSetCamera {
 	position: absolute;
 	top: 1em;
 	left: 2em;
 }
-
 #slider-position-yaw {
 	position: absolute;
 	top: 18em;
@@ -23,13 +29,6 @@
 	height: 10px;
 	width: 300px;
 }
-
-#labelPositionPitch{
-	border: 0;
-	color: #f6931f;
-	font-weight: bold;
-}
-
 #slider-position-pitch{
 	position: absolute;
 	top:  3em;
@@ -37,51 +36,50 @@
 	height: 250px;
 	width: 10px;
 }
-
 #positionPitch{
 	border: 0;
 	color: #f6931f;
 	font-weight: bold;
 }
-
-#labelPositionReached{
+#labelResult{
 	position: absolute;
 	top: 22em;
-	left: 2em;
+	left: 1em;
 }
-
-#moveResult{
-	border: 0;
-	color: #f6931f;
-	font-weight: bold;
+#moveResult {
+	width: 200px;
 }
-
+/*--Sireal icaon--------------*/
 .serialConnection{
 	position: absolute;
 	top: 1em;
 	right: 2em;
 }
-
 .serialNoConnect{
 	color: #ff0000;
 }
-
 .serialConnected{
 	color: #00ff00;
 }
-
 #iconShutdown {
 	position: absolute;
 	top: 2em;
 	right: 1em;;
 }
-
+/*---Power Button-----------------*/
 .ui-icon-power{
 	color: #ff0000;
 }
-
-#tableDirections {
+/*----directions------------------*/
+#tableBaseDirections {
 	position: absolute;
 	top: 2em;
 	left: 23em;
+}
+#cnvsJoy {
+  border:1px #000000;
+}
+#moveForward{
+	text-align:center;
+  vertical-align:middle;
 }

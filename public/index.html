@@ -14,8 +14,8 @@
 </head>
 <body>
 
-	<div id="labelCurrentSet">
-		<label>Currently Set:</label>
+	<div id="labelCurrentSetCamera">
+		<label>Currently Set Camera position:</label>
 		<input type="text" id="labelPositionPitch" readonly />
 		<input type="text" id="positionPitch" readonly	/>
 	</div>
@@ -23,13 +23,16 @@
 	<div id="slider-position-pitch"></div>
 	<div id="slider-position-yaw"></div>
 
-	<div id='labelPositionReached'>
-		<label>Move Result:</label>
+	<div id='labelResult'>
+		<label>Result:</label>
 		<input type='text' id='moveResult' readonly />
 	</div>
-		<!-- button forward---------------------------------------------------------------->
-	<div id="tableDirections">
+	<!-- base directions ---------------------------------------------------------------->
+	<div id="tableBaseDirections">
 		<table>
+			<tr>
+				<td colspan="3">Base Move</td>
+			</tr>
 			<tr>
 				<td><a id="turnLeft" class="ui-icon ui-icon-arrowreturn-1-w"><span>turnleft</span></a></td>
 				<td><a id="moveForward" class="ui-icon ui-icon-arrow-1-n"><span>forward</span></a></td>
@@ -37,31 +40,46 @@
 			</tr>
 			<tr>
 				<td><a id="moveLeft" class="ui-icon ui-icon-arrow-1-w"><span>moveleft</span></a></td>
-				<td></td>
+				<td>
+					<div id="steercontainter">
+						<canvas id="cnvsJoy" width="100px" height="100px"></canvas>
+					</div>
+				</td>
 				<td><a id="moveRight" class="ui-icon ui-icon-arrow-1-e"><span>moveright</span></a></td>
 			</tr>
-						<tr>
+			<tr>
 				<td></td>
 				<td><a id="moveBackward" class="ui-icon ui-icon-arrow-1-s"><span>moveback</span></a></td>
 				<td></td>
 			</tr>
+			<tr>
+				<td colspan="3">
+					<div id="lblBaseVel">
+						<label>Base velocity:</label>
+						<input type="text" id="lblVel" readonly />
+					</div>
+				</td>
+			</tr>
 		</table>
 	</div>
-	
+
 	<!-- Serial Control -------------------------------------------------------->
 	<div id="serialConnection" class="ui-icon ui-icon-refresh">Serial Connection</div>
-	
+
 	<!-- Shutdown Button -------------------------------------------------------->
 	<div id="iconShutdown">
 		<a href="/robota/api/doShutdown" class="ui-icon ui-icon-power">icon</a>
 	</div>
 
+  <!-- Scripts ----------------------------------------------------------------->
+
+  <script src="./javascripts/canvasJoystick.js"></script>
 	<script>
 		var state = '';
-	 	$.get('/state.json', function(data) { state = data ; }); 
+	 	$.get('/state.json', function(data) { state = data ; });
 		var appNameShort = 'robota';
 		var url = '/' + appNameShort + '/api';
-		
+
 		var left = { posYaw : 37, posPitch : 37 } //TODO in zentrale Konfig auslagern und auch in app laden
 		var center = { move: 'stop' }
 		var serial = { state: 'unknown' , command: 'connect' }
@@ -113,7 +131,7 @@
 					$.post(url + '/eye/left', left).done(function(leftEye) {	showMyPositions(leftEye);	});
 				}
 			});
-		});		
+		});
 
 		function showMyPositions(myPositions) {
 			var positions = "";
@@ -124,53 +142,53 @@
 		}
 
 		function doMove(m){
-			$.post(url + '/move', m).done( function(result) {	
+			$.post(url + '/move', m).done( function(result) {
 				showMoveResult(result);	});
 		}
 
 		function showMoveResult(result){
 			$("#moveResult").val(result);
 		}
-		
+
 		//-----Serial-----------------------------------------------------------------------------
 		var elemSC = document.getElementById("serialConnection");
-		//elemSC.classList.add('rotate');		
+		//elemSC.classList.add('rotate');
 		elemSC.classList.add('serialConnection');
 
-		
+
 		function getSerialConnectionState() {
-				$.post(url + '/serial', serial).done( function(result) { 
+				$.post(url + '/serial', serial).done( function(result) {
 					serial.state = result;
 					showSerialState();
 					});
 		}
-		
+
 		function showSerialState(){
-		
+
 			if(serial.state == state.connecting){
 				elemSC.classList.remove('serialNoConnect');
-				
+
 				elemSC.classList.add('serialConnected');
 			}
 			if(serial.state == state.connected){
 				elemSC.classList.remove('serialNoConnect');
 
 				elemSC.classList.add('serialConnected');
-			}		
+			}
 			if(serial.state == state.noConnect){
 				elemSC.classList.remove('serialConnected');
-				
+
 				elemSC.classList.add('serialNoConnect');
 			}
 			if(serial.state == state.noPort){
 				elemSC.classList.remove('serialConnected');
-				
+
 				elemSC.classList.add('serialNoConnect');
 			}
 			//TODO handle all serial states
 			console.log('Serial State = ' + serial.state)
 		}
-		
+
 		//---Serial End-----------------------------------------------------------------------------
 	</script>
 </body>
