@@ -15,7 +15,6 @@
 
     /* first run time set defaults also */
     ctxJoy.lineWidth = 1;
-    drawJoyField();
     inputEnd() ;
 
     function inputStart() {

@@ -66,7 +66,6 @@ http.listen(port, function(){
 
 logger('','starting '+ appName);
 logger('','to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
-}
 
 //--Socket.io------------------------------------------------------------------
 io.on('connection', function (socket) {

@@ -49,7 +49,7 @@ input[type="text"]
 #moveResult {
 	width: 200px;
 }
-/*--Sireal icaon--------------*/
+/*--Serial icon--------------*/
 .serialConnection{
 	position: absolute;
 	top: 1em;
@@ -61,12 +61,12 @@ input[type="text"]
 .serialConnected{
 	color: #00ff00;
 }
+/*---Power Button-----------------*/
 #iconShutdown {
 	position: absolute;
 	top: 2em;
 	right: 1em;;
 }
-/*---Power Button-----------------*/
 .ui-icon-power{
 	color: #ff0000;
 }
