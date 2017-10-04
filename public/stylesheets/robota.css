@@ -9,6 +9,9 @@
 	border: 0;
 	opacity: 0.5;
 }
+.ui-icon:active{
+  opacity: 1.0;
+}
 input[type="text"]
 {
 	width: 50px;
@@ -70,6 +73,9 @@ input[type="text"]
 .ui-icon-power{
 	color: #ff0000;
 }
+.ui-icon-power:active{
+	font-size: 2.5em;
+}
 /*----directions------------------*/
 #tableBaseDirections {
 	position: absolute;
@@ -78,8 +84,4 @@ input[type="text"]
 }
 #cnvsJoy {
   border:1px #000000;
-}
-#moveForward{
-	text-align:center;
-  vertical-align:middle;
 }
