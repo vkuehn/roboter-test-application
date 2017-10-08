@@ -1,37 +1,38 @@
-"use strict";
+'use strict';
+const fs = require('fs');
 
-function getLetter(text) {
-	switch (text) {
-	case 'left':
-		return 'a';
-		break;
-	case 'forward':
-		return 'w';
-		break;
-	case 'backward':
-		return 's';
-		break;
-	case 'right':
-		return 'd';
-		break;
-	case 'turnRight':
-		return 'e';
-		break;
-	case 'turnLeft':
-		return 'q';
-		break;	
-	case 'stand':
-		return '!';
-		break;
-	case 'sit':
-		return '.';
-		break;
-	default:
-		return text;
-		break;
-	}
+//robota = robot application
+const helper = require('../node_modules/node-helper/lib/node-helper');
+var configPath = './robot_config.json';
+var robot = {};
+
+exports.getBaseMove = function (move){
+  if(robot.hasOwnProperty('base')){
+    if(robot.base.hasOwnProperty('move')){
+      if(robot.base.move.hasOwnProperty(move)){
+        return robot.base.move[move];
+      }
+    }
+  }
 }
 
-module.exports = {
-	getLetter : getLetter
+exports.load = function (ROBOT_NAME, fPath){
+	var filePath = configPath;
+	if (fPath) {
+		filePath = fPath;
+	}
+	try{
+    if(fs.existsSync(filePath)){
+      var data = helper.loadFile(filePath);
+  		var jData = JSON.parse(data);
+  		robot  = jData[ROBOT_NAME];
+      return this;
+    }else{
+      console.log('file does noch exist ->' + filePath);
+    }
+	} catch(err){
+		console.log('error: parsing file ' + filePath, err.code);
+	}
 };
+
+exports.robot = function(){return robot};

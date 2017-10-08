@@ -5,14 +5,16 @@ const debug					= require('debug')('ras');
 const express 			= require('express');
 const favicon      	= require('serve-favicon');
 const http         	= require('http').Server(app);
+const helper        = require('node-helper');
 const io 						= require('socket.io')(http);
 const cookieParser 	= require('cookie-parser');
 const path         	= require('path');
 
+
 //
+const ROBOT_NAME = 'mmMover01';
 const sep    = path.sep;
 const config = require(__dirname + sep + 'resources' + sep + 'config.json');
-const helper = require(__dirname + sep + 'node_modules' + sep + 'node-helper' + sep + 'node-helper');
 
 //
 ////keep the order from here !
@@ -25,7 +27,8 @@ var publicPath		= __dirname + sep + config.publicPath + sep;
 var resourcePath	= __dirname + sep + config.resourcePath + sep;
 
 const state	 = require(publicPath + 'state.json');
-const robota = require(resourcePath + 'robota.js');
+let robota = require(resourcePath + 'robota.js');
+robota = robota.load(ROBOT_NAME, resourcePath + 'robot_config.json');
 
 var serialState = state.unknown;
 
@@ -86,7 +89,7 @@ io.on('connection', function (socket) {
 //--Serial--------------------------------------------------------------------
 //var rsSerial = new helper.runScript();
 //var serialLib = resourcePath +'serial.js';
-//// todo  wieder aktivieren wenn status eindeutrig angezeigt werden kann rsSerial.start(serialLib);
+//// todo  wieder aktivieren wenn status eindeutig angezeigt werden kann rsSerial.start(serialLib);
 //
 //setTimeout(function () {
 //	rsSerial.send(debug);
@@ -107,24 +110,21 @@ app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 
 //--API for robot----------------------------------------------------------------
 app.post('/' + appNameShort + '/api/move',function (req, res) {
-	move.command = req.body.move;
-	if(debug){logger('apiMove','recieved move command ' + move.command);}
-	var m = robota.getLetter(move.command);
-	if(debug){logger('move',m);}
-	//TODO
-//	if (move.command != ''  && move.length() == 1 && serialState == state.connected){
-//		rsSerial.send(m);
-//		move.result = "send " + m;
-//	}
-	//res.send(JSON.stringify('moved ' + move));
-  move.result = move.command;
-	res.send(move.result);
+  try{
+    move.command = req.body.move;
+    if(debug){logger('apiMove','recieved move command ' + move.command);}
+    var m = robota.getBaseMove(move.command);
+    if(debug){logger('apiMove', 'return ' + m);}
+    move.result = m;                              //here we talk to the robot
+    res.send(move.result);
+  }catch (e) {
+    logger('apiMove', e);
+  }
 });
 
 app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
 	left.posPitch = req.body.posPitch;
 	left.posYaw = req.body.posYaw;
-	//MQTT Update
 	res.send(left);
 });
 

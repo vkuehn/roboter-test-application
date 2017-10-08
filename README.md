@@ -1,2 +1,2 @@
 # roboter-test-application
-Node Js Web Page to send simple comands to a robot
+Node Js Dummy app to work on a robot control web page

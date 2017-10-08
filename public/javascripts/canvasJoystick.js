@@ -1,9 +1,9 @@
-    var canvasJoy = document.getElementById("cnvsJoy");
-    var ctxJoy = canvasJoy.getContext("2d");
-    var rectJoy = canvasJoy.getBoundingClientRect();
-    var mdown = false;
-    var posJoy = setCenter(rectJoy);
-    var vel = setVel();
+    const canvasJoy = document.getElementById("cnvsJoy");
+    const ctxJoy = canvasJoy.getContext("2d");
+    const rectJoy = canvasJoy.getBoundingClientRect();
+    let mdown = false;
+    let posJoy = setCenter(rectJoy);
+    let vel = setVel();
 
     canvasJoy.addEventListener("mousedown", inputStart, false);
     canvasJoy.addEventListener("mouseup", inputEnd, false);
@@ -73,10 +73,10 @@
           linearX: posJoy.x,
           linearY: posJoy.y,
           linearZ: 0.0,
-          linearX: 0.0,
-          linearY: 0.0,
-          linearZ: 0.0
-      }
+          angularX: 0.0,
+          angularY: 0.0,
+          angularZ: 0.0
+      };
       return vel;
     }
 
@@ -85,6 +85,7 @@
     }
     function printPos() {
       $("#lblVel").val(" " + vel.linearX + "," + vel.linearY);
+      showMoveResult(JSON.stringify(vel));    //here we talk to the robot
     }
     function drawJoyHandle() {
       ctxJoy.clearRect(0, 0, rectJoy.width, rectJoy.height);

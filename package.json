@@ -17,6 +17,7 @@
     "json": "^9.0.4",
     "morgan": "~1.7.0",
     "multer": "^1.2.1",
+    "node-helper": "github:vkuehn/node-helper",
     "serialport": "^4.0.7",
     "serve-favicon": "~2.3.0",
     "socket.io": "^1.7.2"

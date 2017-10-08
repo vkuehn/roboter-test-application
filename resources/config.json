@@ -11,7 +11,6 @@
   },
   "move": {
 	  "command":	"none",
-	  "direction":	"none",
 	  "result":		"none"
   }
 }
