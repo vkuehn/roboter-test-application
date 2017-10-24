@@ -3,23 +3,23 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
     "body-parser-json": "*",
     "connect": "^3.5.0",
     "cookie-parser": "~1.4.3",
-    "debug": "^2.6.0",
+    "debug": "^3.1.0",
     "express": "^4.14.0",
     "express-json": "*",
     "jade": "^1.11.0",
     "json": "^9.0.4",
-    "morgan": "~1.7.0",
+    "morgan": "~1.9.0",
     "multer": "^1.2.1",
     "node-helper": "github:vkuehn/node-helper",
-    "serialport": "^4.0.7",
-    "serve-favicon": "~2.3.0",
-    "socket.io": "^1.7.2"
+    "serialport": "^6.0.3",
+    "serve-favicon": "~2.4.5",
+    "socket.io": "^2.0.4"
   }
 }
