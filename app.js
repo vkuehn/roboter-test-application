@@ -1,7 +1,7 @@
 "use strict";
 
 const app		    		= require('express')();
-const debug					= require('debug')('ras');
+const debug					= require('debug')('rta');
 const express 			= require('express');
 const favicon      	= require('serve-favicon');
 const http         	= require('http').Server(app);
@@ -9,7 +9,6 @@ const helper        = require('node-helper');
 const io 						= require('socket.io')(http);
 const cookieParser 	= require('cookie-parser');
 const path         	= require('path');
-
 
 //
 const ROBOT_NAME = 'mmMover01';

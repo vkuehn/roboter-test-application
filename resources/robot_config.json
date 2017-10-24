@@ -1,6 +1,5 @@
 {
   "mmMover01": {
-        "debug": "true",
       	"base":{
                  "move":{
                       "w":"1.0,0.0",
@@ -34,6 +33,13 @@
                         "-":"-1.0,-1.0"
                   }
       	},
-        "name": "mmMover01"
+        "name": "mmMover01",
+        "server_node": {
+          "port": "9090",
+          "debug": "true"
+        },
+        "base_node": {
+          "debug": "true"
+        }
   }
 }

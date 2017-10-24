@@ -48,7 +48,7 @@
 				<td><a id="moveRight" class="ui-icon ui-icon-arrowthick-1-e"><span>moveright</span></a></td>
 			</tr>
 			<tr>
-                <td><a id="stand" class="ui-icon ui-icon-closethick"><span>stand</span></a></td>
+        <td><a id="stand" class="ui-icon ui-icon-closethick"><span>stand</span></a></td>
 				<td><a id="moveBackward" class="ui-icon ui-icon-arrowthick-1-s"><span>moveback</span></a></td>
 				<td></td>
 			</tr>
@@ -83,7 +83,17 @@
 		var serial = { state: 'unknown' , command: 'connect' }
 		var textYaw = 'yaw';
 		var textPitch = 'pitch';
+		//----websocket---------------------------------------------
+    var ws;
+		ws = new WebSocket("ws://192.168.1.102:9090/websocket");
+		ws.onmessage = function(e) {showMoveResult(e.data);};
+		function showMoveResult(result){
+			$("#moveResult").val(result);
+		}
 
+		function sendMsg(messageToServer) {
+			ws.send(messageToServer);
+		}
 		//--init-------------------------------------------------
 		$(function() {
 			/*set default screen text values*/
@@ -91,13 +101,13 @@
 			$("#labelPositionPitch").val(textYaw + " " + left.posYaw);
 			$("#positionPitch").val(textPitch + " " + left.posPitch);
 			/*set arrow functions*/
-			document.getElementById("moveLeft").addEventListener("click",function(){     base.move ='left';      doMove(base)} );
-			document.getElementById("moveForward").addEventListener("click",function(){  base.move ='forward';   doMove(base)} );
-			document.getElementById("moveRight").addEventListener("click",function(){    base.move ='right';     doMove(base)} );
-			document.getElementById("moveBackward").addEventListener("click",function(){ base.move ='backward';  doMove(base)} );
-			document.getElementById("turnLeft").addEventListener("click",function(){     base.move ='turnLeft';  doMove(base)} );
-			document.getElementById("turnRight").addEventListener("click",function(){    base.move ='turnRight'; doMove(base)} );
-            document.getElementById("stand").addEventListener("click",function(){        base.move ='stand'; doMove(base)} );
+			document.getElementById("moveLeft").addEventListener("click",function(){     base.move ='left';      sendMsg(base)} );
+			document.getElementById("moveForward").addEventListener("click",function(){  base.move ='forward';   sendMsg(base)} );
+			document.getElementById("moveRight").addEventListener("click",function(){    base.move ='right';     sendMsg(base)} );
+			document.getElementById("moveBackward").addEventListener("click",function(){ base.move ='backward';  sendMsg(base)} );
+			document.getElementById("turnLeft").addEventListener("click",function(){     base.move ='turnLeft';  sendMsg(base)} );
+			document.getElementById("turnRight").addEventListener("click",function(){    base.move ='turnRight'; sendMsg(base)} );
+      document.getElementById("stand").addEventListener("click",function(){        base.move ='stand';     sendMsg(base)} );
 			/*serial Connection*/
 			document.getElementById("serialConnection").addEventListener("click",function () { getSerialConnectionState() })	});
 
@@ -111,7 +121,7 @@
 				slide : function(event, ui) {
 					left.posYaw = ui.value;
 					$("#labelPositionPitch").val(textYaw + " " + left.posYaw);
-					$.post(url + '/eye/left', left).done(function(leftEye) {	showMyPositions(leftEye); });
+					sendMsg('leftYaw:' + left.posYaw);
 				}
 			});
 		});
@@ -127,7 +137,7 @@
 				slide : function(event, ui) {
 					left.posPitch = ui.value;
 					$("#positionPitch").val(textPitch + " " + left.posPitch);
-					$.post(url + '/eye/left', left).done(function(leftEye) {	showMyPositions(leftEye);	});
+					sendMsg('leftPitch:' + left.posPitch);
 				}
 			});
 		});
@@ -138,11 +148,6 @@
 				positions = positions + p + ":" + (myPositions[p] + " ");
 			}
 			showMoveResult(positions);
-		}
-
-		function doMove(m){
-			$.post(url + '/move', m).done( function(result) {
-			showMoveResult(result);	});
 		}
 
 		function showMoveResult(result){
