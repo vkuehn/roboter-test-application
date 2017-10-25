@@ -33,7 +33,7 @@ let serialState = state.unknown;
 
 //=============================================================================
 function logger(funName, message){
-	var text = '[' + appName + '][' + funName + ']' + message;
+	let text = '[' + appName + '][' + funName + ']' + message;
 	console.log(text);
 }
 
@@ -73,10 +73,10 @@ logger(appNameShort,'to see more debug output on linux export DEBUG=* e.g. on wi
 io.on('connection', function (socket) {
 	if(debug){logger('socket.io', 'client Connected');}
 
-	if(debug){logger('socket.io', 'send to client Welcome');}
+	if(debug){logger('socket.io', 'client Welcome');}
 	socket.emit('welcome', "Hello client");
 
-	socket.on('chat message', function (data) {
+	socket.on('message', function (data) {
 		if(debug){logger('socket.io', 'recieved from client:' + data);}
 	});
 

@@ -1,16 +1,16 @@
 {
-  "appName": "roboter-test-application",
+  "appName":      "roboter-test-application",
   "appNameShort": "rta",
-  "appDataPath": "/data/",
+  "appDataPath":  "/data/",
   "port": 8080,
-  "publicPath": "public",
+  "publicPath":   "public",
   "resourcePath": "resources",
   "left": {
       "posPitch":37,
       "posYaw":37
   },
   "move": {
-	  "command":	"none",
-	  "result":		"none"
+	  "command": "none",
+	  "result":	 "none"
   }
 }
