@@ -5,7 +5,7 @@ const debug					= require('debug')('rta');
 const express 			= require('express');
 const favicon      	= require('serve-favicon');
 const http         	= require('http').Server(app);
-const helper        = require('node-helper');
+//const helper        = require('node-helper');
 const io 						= require('socket.io')(http);
 const cookieParser 	= require('cookie-parser');
 const path         	= require('path');
@@ -17,19 +17,19 @@ const config = require(__dirname + sep + 'resources' + sep + 'config.json');
 
 //
 ////keep the order from here !
-var appName       = config.appName;
-var appNameShort	= config.appNameShort;
-var left			    = config.left;
-var move			    = config.move;
-var port			    = config.port;
-var publicPath		= __dirname + sep + config.publicPath + sep;
-var resourcePath	= __dirname + sep + config.resourcePath + sep;
+const appName       = config.appName;
+const appNameShort	= config.appNameShort;
+let left			      = config.left;
+let move			      = config.move;
+const port			    = config.port;
+const publicPath		= __dirname + sep + config.publicPath + sep;
+const resourcePath	= __dirname + sep + config.resourcePath + sep;
 
-const state	 = require(publicPath + 'state.json');
+let state	 = require(publicPath + 'state.json');
 let robota = require(resourcePath + 'robota.js');
 robota = robota.load(ROBOT_NAME, resourcePath + 'robot_config.json');
 
-var serialState = state.unknown;
+let serialState = state.unknown;
 
 //=============================================================================
 function logger(funName, message){
@@ -52,7 +52,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //--json body parser----------------------------------------------------------
 const bodyParser = require('body-parser');
 app.use( bodyParser.json() );
-var urlencodedParser = app.use(bodyParser.urlencoded({
+let urlencodedParser = app.use(bodyParser.urlencoded({
   extended: false
 }));
 
@@ -61,13 +61,13 @@ app.get('/', function(req, res){
 });
 
 http.listen(port, function(){
-	var host = http.address().address
-	var message = ' app listening at http://' + host + ':' + port;
-	debug(message);
+	let host = http.address().address
+	let message = ' app listening at http://' + host + ':' + port;
+	logger('listen', message);
 });
 
-logger('','starting '+ appName);
-logger('','to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
+logger(appNameShort,'starting '+ appName);
+logger(appNameShort,'to see more debug output on linux export DEBUG=* e.g. on windows set DEBUG=*,-not_this');
 
 //--Socket.io------------------------------------------------------------------
 io.on('connection', function (socket) {
@@ -85,21 +85,6 @@ io.on('connection', function (socket) {
 	},2501);
 });
 
-//--Serial--------------------------------------------------------------------
-//var rsSerial = new helper.runScript();
-//var serialLib = resourcePath +'serial.js';
-//// todo  wieder aktivieren wenn status eindeutig angezeigt werden kann rsSerial.start(serialLib);
-//
-//setTimeout(function () {
-//	rsSerial.send(debug);
-//}, 100);
-//
-////--maintain serialState
-//setInterval(function (){
-//	serialState = rsSerial.getState();
-//	if(debug){ logger('serialState',serialState); }
-//},3000);
-
 //==API's=======================================================================
 app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 	if(debug){logger('shutdown',' shutdown by the User');}
@@ -107,38 +92,6 @@ app.get('/' + appNameShort + '/api/doShutdown',function (req, res) {
 	finishThis();
 });
 
-//--API for robot----------------------------------------------------------------
-app.post('/' + appNameShort + '/api/move',function (req, res) {
-  try{
-    move.command = req.body.move;
-    if(debug){logger('apiMove','recieved move command ' + move.command);}
-    var m = robota.getBaseMove(move.command);
-    if(debug){logger('apiMove', 'return ' + m);}
-    move.result = m;                              //here we talk to the robot
-    res.send(move.result);
-  }catch (e) {
-    logger('apiMove', e);
-  }
-});
-
-app.post('/' + appNameShort + '/api/eye/left', function (req, res) {
-	left.posPitch = req.body.posPitch;
-	left.posYaw = req.body.posYaw;
-	res.send(left);
-});
-
-app.post('/' + appNameShort + '/api/serial',function (req, res) {
-	var sCommand = req.body.command;
-	if(debug){ logger('apiSerial', 'command:' + sCommand); }
-	var c = robota.getLetter(sCommand);
-	var cResult = '';
-	if (move != ''  && move.length() == 1){
-		cResult = rsSerial.send(c);
-	}
-	res.send(cResult);
-});
-
-//--
 logger ('start','started');
 //==error handlers==============================================================
 

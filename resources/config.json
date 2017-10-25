@@ -1,6 +1,6 @@
 {
   "appName": "roboter-test-application",
-  "appNameShort": "robota",
+  "appNameShort": "rta",
   "appDataPath": "/data/",
   "port": 8080,
   "publicPath": "public",

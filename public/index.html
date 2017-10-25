@@ -78,7 +78,7 @@
 		var appNameShort = 'robota';
 		var url = '/' + appNameShort + '/api';
 
-		var left = { posYaw : 37, posPitch : 37 } //TODO in zentrale Konfig auslagern und auch in app laden
+		var left = { posYaw : 37, posPitch : 37 }
 		var base = { move: 'stop' }
 		var serial = { state: 'unknown' , command: 'connect' }
 		var textYaw = 'yaw';
@@ -189,7 +189,6 @@
 
 				elemSC.classList.add('serialNoConnect');
 			}
-			//TODO handle all serial states
 			console.log('Serial State = ' + serial.state)
 		}
 
