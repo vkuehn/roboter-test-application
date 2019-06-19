@@ -1,25 +1,25 @@
 {
   "name": "robot-applications-server",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "body-parser": "^1.15.2",
+    "body-parser": "^1.19.0",
     "body-parser-json": "*",
-    "connect": "^3.5.0",
-    "cookie-parser": "~1.4.3",
-    "debug": "^2.6.0",
-    "express": "^4.14.0",
+    "connect": "^3.7.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
     "express-json": "*",
     "jade": "^1.11.0",
-    "json": "^9.0.4",
-    "morgan": "~1.7.0",
-    "multer": "^1.2.1",
-    "node-helper": "github:vkuehn/node-helper",
-    "serialport": "^4.0.7",
-    "serve-favicon": "~2.3.0",
-    "socket.io": "^1.7.2"
+    "json": "^9.0.6",
+    "morgan": "~1.9.1",
+    "multer": "^1.4.1",
+    "node-helper": "0.1.1",
+    "serialport": "^7.1.5",
+    "serve-favicon": "~2.5.0",
+    "socket.io": "^2.2.0"
   }
 }

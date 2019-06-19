@@ -1,8 +1,8 @@
 'use strict';
 const fs = require('fs');
+const helper = require('node-helper');
 
 //robota = robot application
-const helper = require('../node_modules/node-helper/lib/node-helper');
 var configPath = './robot_config.json';
 var robot = {};
 
